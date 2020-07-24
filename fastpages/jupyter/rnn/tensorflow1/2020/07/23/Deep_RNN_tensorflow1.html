@@ -3,34 +3,34 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Deep RNN using Tensorflow 1 and keras | fastpages</title>
+<title>A guided introduction to building a Deep Recurrent Neural Network (DRNN) from scratch | fastpages</title>
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Deep RNN using Tensorflow 1 and keras" />
+<meta property="og:title" content="A guided introduction to building a Deep Recurrent Neural Network (DRNN) from scratch" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="An easy to use blogging platform with support for Jupyter Notebooks." />
-<meta property="og:description" content="An easy to use blogging platform with support for Jupyter Notebooks." />
-<link rel="canonical" href="https://edumunozsala.github.io/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html" />
-<meta property="og:url" content="https://edumunozsala.github.io/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html" />
+<meta name="description" content="This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition" />
+<meta property="og:description" content="This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition" />
+<link rel="canonical" href="https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html" />
+<meta property="og:url" content="https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html" />
 <meta property="og:site_name" content="fastpages" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-07-23T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"An easy to use blogging platform with support for Jupyter Notebooks.","@type":"BlogPosting","headline":"Deep RNN using Tensorflow 1 and keras","dateModified":"2020-07-23T00:00:00-05:00","datePublished":"2020-07-23T00:00:00-05:00","url":"https://edumunozsala.github.io/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://edumunozsala.github.io/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html"},"@context":"https://schema.org"}</script>
+{"description":"This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition","@type":"BlogPosting","headline":"A guided introduction to building a Deep Recurrent Neural Network (DRNN) from scratch","dateModified":"2020-07-23T00:00:00-05:00","datePublished":"2020-07-23T00:00:00-05:00","url":"https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/BlogEms/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://edumunozsala.github.io/BlogEms/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/BlogEms/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Deep RNN using Tensorflow 1 and keras | fastpages</title>
+<title>A guided introduction to building a Deep Recurrent Neural Network (DRNN) from scratch | fastpages</title>
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Deep RNN using Tensorflow 1 and keras" />
+<meta property="og:title" content="A guided introduction to building a Deep Recurrent Neural Network (DRNN) from scratch" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="An easy to use blogging platform with support for Jupyter Notebooks." />
-<meta property="og:description" content="An easy to use blogging platform with support for Jupyter Notebooks." />
-<link rel="canonical" href="https://edumunozsala.github.io/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html" />
-<meta property="og:url" content="https://edumunozsala.github.io/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html" />
+<meta name="description" content="This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition" />
+<meta property="og:description" content="This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition" />
+<link rel="canonical" href="https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html" />
+<meta property="og:url" content="https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html" />
 <meta property="og:site_name" content="fastpages" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2020-07-23T00:00:00-05:00" />
 <script type="application/ld+json">
-{"description":"An easy to use blogging platform with support for Jupyter Notebooks.","@type":"BlogPosting","headline":"Deep RNN using Tensorflow 1 and keras","dateModified":"2020-07-23T00:00:00-05:00","datePublished":"2020-07-23T00:00:00-05:00","url":"https://edumunozsala.github.io/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://edumunozsala.github.io/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html"},"@context":"https://schema.org"}</script>
+{"description":"This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition","@type":"BlogPosting","headline":"A guided introduction to building a Deep Recurrent Neural Network (DRNN) from scratch","dateModified":"2020-07-23T00:00:00-05:00","datePublished":"2020-07-23T00:00:00-05:00","url":"https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 <link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
@@ -85,7 +85,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Deep RNN using Tensorflow 1 and keras</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-07-23T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">A guided introduction to building a Deep Recurrent Neural Network (DRNN) from scratch</h1><p class="page-description">This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-07-23T00:00:00-05:00" itemprop="datePublished">
         Jul 23, 2020
       </time>
        • <span class="read-time" title="Estimated read time">
@@ -96,33 +96,39 @@ window.onload = wrap_img;
 </span></p>
 
     
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#fastpages">fastpages</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#jupyter">jupyter</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#RNN">RNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#Tensorflow1">Tensorflow1</a>
+        
+      
+      </p>
+    
 
     
-      
-        <div class="pb-5 d-flex flex-wrap flex-justify-end">
-          <div class="px-2">
-
-    <a href="https://github.com/edumunozsala/BlogEms/tree/master/_notebooks/2020-07-23-Deep_RNN_tensorflow1.ipynb" role="button" target="_blank">
-<img class="notebook-badge-image" src="/BlogEms/assets/badges/github.svg" alt="View On GitHub">
-    </a>
-</div>
-
-          <div class="px-2">
-    <a href="https://mybinder.org/v2/gh/edumunozsala/BlogEms/master?filepath=_notebooks%2F2020-07-23-Deep_RNN_tensorflow1.ipynb" target="_blank">
-        <img class="notebook-badge-image" src="/BlogEms/assets/badges/binder.svg" alt="Open In Binder"/>
-    </a>
-</div>
-
-          <div class="px-2">
-    <a href="https://colab.research.google.com/github/edumunozsala/BlogEms/blob/master/_notebooks/2020-07-23-Deep_RNN_tensorflow1.ipynb" target="_blank">
-        <img class="notebook-badge-image" src="/BlogEms/assets/badges/colab.svg" alt="Open In Colab"/>
-    </a>
-</div>
-        </div>
       </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <!--
+    <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#Deep-Recurrent-Neural-Network-using-TensorFlow-1-and-Keras-lybrary">Deep Recurrent Neural Network using TensorFlow 1 and Keras lybrary </a></li>
+<li class="toc-entry toc-h2"><a href="#Multi-RNNCell">Multi RNNCell </a></li>
+<li class="toc-entry toc-h2"><a href="#Applying-Dropout">Applying Dropout </a></li>
+<li class="toc-entry toc-h2"><a href="#Handling-long-sequences">Handling long sequences </a></li>
+<li class="toc-entry toc-h2"><a href="#LSTM">LSTM </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#PEEPHOLE-Connection">PEEPHOLE Connection </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h2"><a href="#GRU-Cells">GRU Cells </a></li>
+</ul><!--
 #################################################
 ### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
 #################################################
@@ -138,32 +144,20 @@ window.onload = wrap_img;
 </div>
     
 
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
+<div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># &quot;A guided introduction to building a Deep Recurrent Neural Network (DRNN) from scratch&quot;</span>
-<span class="o">&gt;</span> <span class="s2">&quot;This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition&quot;</span>
-
-<span class="o">-</span> <span class="n">toc</span><span class="p">:</span> <span class="n">true</span>
-<span class="o">-</span> <span class="n">branch</span><span class="p">:</span> <span class="n">master</span>
-<span class="o">-</span> <span class="n">badges</span><span class="p">:</span> <span class="n">false</span>
-<span class="o">-</span> <span class="n">comments</span><span class="p">:</span> <span class="n">false</span>
-<span class="o">-</span> <span class="n">categories</span><span class="p">:</span> <span class="p">[</span><span class="n">fastpages</span><span class="p">,</span> <span class="n">jupyter</span><span class="p">,</span> <span class="n">RNN</span><span class="p">,</span> <span class="n">Tensorflow1</span><span class="p">]</span>
-<span class="o">-</span> <span class="n">hide</span><span class="p">:</span> <span class="n">false</span>
-<span class="o">-</span> <span class="n">search_exclude</span><span class="p">:</span> <span class="n">true</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Deep-Recurrent-Neural-Network-using-TensorFlow-1-and-Keras-lybrary">
+<a class="anchor" href="#Deep-Recurrent-Neural-Network-using-TensorFlow-1-and-Keras-lybrary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deep Recurrent Neural Network using TensorFlow 1 and Keras lybrary<a class="anchor-link" href="#Deep-Recurrent-Neural-Network-using-TensorFlow-1-and-Keras-lybrary"> </a>
+</h2>
+<p>This notebook explain and describe how to desing a deep RNN and then introduce us to the LSTM and GRU cells, a more advanced RNN designed to solve some well-known limitations of the deep, large, RNN. As the previous notebook, the texts and code section are extracted from the great book  "Hands-on Machine Learning with Scikit Learn ad Tensorflow First Edition". We highly encourage you to read it.</p>
+<p>It is quite common to stack multiple layers of cells. This gives you a deep RNN.
+To implement a deep RNN in TensorFlow, you can create several cells and stack them
+into a MultiRNNCell. In the following code we stack three identical cells</p>
 
 </div>
-    
-
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -175,18 +169,18 @@ window.onload = wrap_img;
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.labelsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">14</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;xtick.labelsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;ytick.labelsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">'axes.labelsize'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">'xtick.labelsize'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">'ytick.labelsize'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span>
 
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># Ignore and hide warnings</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">'ignore'</span><span class="p">)</span>
 
-<span class="c1"># to make this notebook&#39;s output stable across runs</span>
+<span class="c1"># to make this notebook's output stable across runs</span>
 <span class="k">def</span> <span class="nf">reset_graph</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">):</span>
     <span class="n">tf</span><span class="o">.</span><span class="n">reset_default_graph</span><span class="p">()</span>
     <span class="n">tf</span><span class="o">.</span><span class="n">set_random_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
@@ -230,9 +224,13 @@ window.onload = wrap_img;
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Multi-RNNCell">Multi RNNCell<a class="anchor-link" href="#Multi-RNNCell"> </a></h2><p>Now we can create our multiple layer RNN using a MultiRNNCell and unrolling it.</p>
+<h2 id="Multi-RNNCell">
+<a class="anchor" href="#Multi-RNNCell" aria-hidden="true"><span class="octicon octicon-link"></span></a>Multi RNNCell<a class="anchor-link" href="#Multi-RNNCell"> </a>
+</h2>
+<p>Now we can create our multiple layer RNN using a MultiRNNCell and unrolling it.</p>
 
 </div>
 </div>
@@ -285,7 +283,8 @@ window.onload = wrap_img;
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The states variable is a tuple containing one tensor per layer,
 each representing the final state of that layer’s cell (with shape [batch_size, n_neu
@@ -350,9 +349,13 @@ along the column axis (i.e., its shape is [batch_size, n_layers * n_neurons]).</
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Applying-Dropout">Applying Dropout<a class="anchor-link" href="#Applying-Dropout"> </a></h2><p>If you build a very deep RNN, it may end up overfitting the training set. To prevent
+<h2 id="Applying-Dropout">
+<a class="anchor" href="#Applying-Dropout" aria-hidden="true"><span class="octicon octicon-link"></span></a>Applying Dropout<a class="anchor-link" href="#Applying-Dropout"> </a>
+</h2>
+<p>If you build a very deep RNN, it may end up overfitting the training set. To prevent
 that, a common technique is to apply dropout. You can
 simply add a dropout layer before or after the RNN as usual, but if you also want to
 apply dropout between the RNN layers, you need to use a DropoutWrapper.</p>
@@ -413,7 +416,8 @@ Please use `rate` instead of `keep_prob`. Rate should be set to `rate = 1 - keep
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The rest of the construction phase is like earlier</p>
 
@@ -464,7 +468,8 @@ Use keras.layers.dense instead.
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Unfortunately, this code is only usable for training, because the DropoutWrapper class has no training parameter, so it always applies dropout, even when the model is not being trained, so we must first train the model, then create a different model for testing, without the DropoutWrapper.</p>
 
@@ -487,9 +492,9 @@ Use keras.layers.dense instead.
         <span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="o">=</span> <span class="n">next_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">mse</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">training_op</span><span class="p">,</span> <span class="n">loss</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">y_batch</span><span class="p">})</span>
         <span class="k">if</span> <span class="n">iteration</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="s2">&quot;Training MSE:&quot;</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="s2">"Training MSE:"</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
     
-    <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="s2">&quot;./my_dropout_time_series_model&quot;</span><span class="p">)</span>
+    <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="s2">"./my_dropout_time_series_model"</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -517,7 +522,8 @@ Use keras.layers.dense instead.
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now that the model is trained, we need to create the model again, but without the DropoutWrapper for testing:
 <strong>Another option is set keep_prob to 1.0 in a new model for testing__</strong></p>
@@ -577,17 +583,17 @@ Use keras.layers.dense instead.
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
-    <span class="n">saver</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="s2">&quot;./my_dropout_time_series_model&quot;</span><span class="p">)</span>
+    <span class="n">saver</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="s2">"./my_dropout_time_series_model"</span><span class="p">)</span>
 
     <span class="n">X_new</span> <span class="o">=</span> <span class="n">time_series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">n_inputs</span><span class="p">)))</span>
     <span class="n">y_pred</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">X_new</span><span class="p">})</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Testing the model&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_series</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">&quot;bo&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;instance&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">time_series</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="s2">&quot;w*&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;target&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;r.&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;prediction&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Testing the model"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_series</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">"bo"</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"instance"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">time_series</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="s2">"w*"</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"target"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"r."</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"prediction"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Time"</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -618,7 +624,7 @@ INFO:tensorflow:Restoring parameters from ./my_dropout_time_series_model
 &lt;!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"&gt;
 <!-- Created with matplotlib (https://matplotlib.org/) -->
-<svg height="284.640938pt" version="1.1" viewBox="0 0 373.890625 284.640938" width="373.890625pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg height="284.640938pt" version="1.1" viewbox="0 0 373.890625 284.640938" width="373.890625pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
  <defs>
   <style type="text/css">
 *{stroke-linecap:butt;stroke-linejoin:round;}
@@ -631,7 +637,7 @@ L 373.890625 284.640938
 L 373.890625 0 
 L 0 0 
 z
-" style="fill:none;" />
+" style="fill:none;"></path>
   </g>
   <g id="axes_1">
    <g id="patch_2">
@@ -640,7 +646,7 @@ L 366.690625 241.277813
 L 366.690625 23.837812 
 L 31.890625 23.837812 
 z
-" style="fill:#ffffff;" />
+" style="fill:#ffffff;"></path>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
@@ -648,10 +654,10 @@ z
       <defs>
        <path d="M 0 0 
 L 0 3.5 
-" id="mea35983720" style="stroke:#000000;stroke-width:0.8;" />
+" id="mea35983720" style="stroke:#000000;stroke-width:0.8;"></path>
       </defs>
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="90.589326" xlink:href="#mea35983720" y="241.277813" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="90.589326" xlink:href="#mea35983720" y="241.277813"></use>
       </g>
      </g>
      <g id="text_1">
@@ -669,7 +675,7 @@ L 54.390625 8.296875
 L 54.390625 0 
 L 12.40625 0 
 z
-" id="DejaVuSans-49" />
+" id="DejaVuSans-49"></path>
        <path d="M 19.1875 8.296875 
 L 53.609375 8.296875 
 L 53.609375 0 
@@ -693,13 +699,13 @@ Q 49.859375 40.875 45.40625 35.40625
 Q 44.1875 33.984375 37.640625 27.21875 
 Q 31.109375 20.453125 19.1875 8.296875 
 z
-" id="DejaVuSans-50" />
+" id="DejaVuSans-50"></path>
        <path d="M 10.6875 12.40625 
 L 21 12.40625 
 L 21 0 
 L 10.6875 0 
 z
-" id="DejaVuSans-46" />
+" id="DejaVuSans-46"></path>
        <path d="M 10.796875 72.90625 
 L 49.515625 72.90625 
 L 49.515625 64.59375 
@@ -723,20 +729,20 @@ Q 35.15625 39.890625 26.703125 39.890625
 Q 22.75 39.890625 18.8125 39.015625 
 Q 14.890625 38.140625 10.796875 36.28125 
 z
-" id="DejaVuSans-53" />
+" id="DejaVuSans-53"></path>
       </defs>
       <g transform="translate(77.229951 257.395938)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-49" />
-       <use x="63.623047" xlink:href="#DejaVuSans-50" />
-       <use x="127.246094" xlink:href="#DejaVuSans-46" />
-       <use x="159.033203" xlink:href="#DejaVuSans-53" />
+       <use xlink:href="#DejaVuSans-49"></use>
+       <use x="63.623047" xlink:href="#DejaVuSans-50"></use>
+       <use x="127.246094" xlink:href="#DejaVuSans-46"></use>
+       <use x="159.033203" xlink:href="#DejaVuSans-53"></use>
       </g>
      </g>
     </g>
     <g id="xtick_2">
      <g id="line2d_2">
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="163.056859" xlink:href="#mea35983720" y="241.277813" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="163.056859" xlink:href="#mea35983720" y="241.277813"></use>
       </g>
      </g>
      <g id="text_2">
@@ -773,7 +779,7 @@ Q 53.90625 64.015625 53.90625 55.328125
 Q 53.90625 49.265625 50.4375 45.09375 
 Q 46.96875 40.921875 40.578125 39.3125 
 z
-" id="DejaVuSans-51" />
+" id="DejaVuSans-51"></path>
        <path d="M 31.78125 66.40625 
 Q 24.171875 66.40625 20.328125 58.90625 
 Q 16.5 51.421875 16.5 36.375 
@@ -794,36 +800,36 @@ Q 6.59375 17.96875 6.59375 36.375
 Q 6.59375 54.828125 13.0625 64.515625 
 Q 19.53125 74.21875 31.78125 74.21875 
 z
-" id="DejaVuSans-48" />
+" id="DejaVuSans-48"></path>
       </defs>
       <g transform="translate(149.697484 257.395938)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-49" />
-       <use x="63.623047" xlink:href="#DejaVuSans-51" />
-       <use x="127.246094" xlink:href="#DejaVuSans-46" />
-       <use x="159.033203" xlink:href="#DejaVuSans-48" />
+       <use xlink:href="#DejaVuSans-49"></use>
+       <use x="63.623047" xlink:href="#DejaVuSans-51"></use>
+       <use x="127.246094" xlink:href="#DejaVuSans-46"></use>
+       <use x="159.033203" xlink:href="#DejaVuSans-48"></use>
       </g>
      </g>
     </g>
     <g id="xtick_3">
      <g id="line2d_3">
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="235.524391" xlink:href="#mea35983720" y="241.277813" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="235.524391" xlink:href="#mea35983720" y="241.277813"></use>
       </g>
      </g>
      <g id="text_3">
       <!-- 13.5 -->
       <g transform="translate(222.165016 257.395938)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-49" />
-       <use x="63.623047" xlink:href="#DejaVuSans-51" />
-       <use x="127.246094" xlink:href="#DejaVuSans-46" />
-       <use x="159.033203" xlink:href="#DejaVuSans-53" />
+       <use xlink:href="#DejaVuSans-49"></use>
+       <use x="63.623047" xlink:href="#DejaVuSans-51"></use>
+       <use x="127.246094" xlink:href="#DejaVuSans-46"></use>
+       <use x="159.033203" xlink:href="#DejaVuSans-53"></use>
       </g>
      </g>
     </g>
     <g id="xtick_4">
      <g id="line2d_4">
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="307.991924" xlink:href="#mea35983720" y="241.277813" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="307.991924" xlink:href="#mea35983720" y="241.277813"></use>
       </g>
      </g>
      <g id="text_4">
@@ -845,13 +851,13 @@ L 37.796875 17.1875
 L 4.890625 17.1875 
 L 4.890625 26.703125 
 z
-" id="DejaVuSans-52" />
+" id="DejaVuSans-52"></path>
       </defs>
       <g transform="translate(294.632549 257.395938)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-49" />
-       <use x="63.623047" xlink:href="#DejaVuSans-52" />
-       <use x="127.246094" xlink:href="#DejaVuSans-46" />
-       <use x="159.033203" xlink:href="#DejaVuSans-48" />
+       <use xlink:href="#DejaVuSans-49"></use>
+       <use x="63.623047" xlink:href="#DejaVuSans-52"></use>
+       <use x="127.246094" xlink:href="#DejaVuSans-46"></use>
+       <use x="159.033203" xlink:href="#DejaVuSans-48"></use>
       </g>
      </g>
     </g>
@@ -867,7 +873,7 @@ L 25.59375 0
 L 25.59375 64.59375 
 L -0.296875 64.59375 
 z
-" id="DejaVuSans-84" />
+" id="DejaVuSans-84"></path>
       <path d="M 9.421875 54.6875 
 L 18.40625 54.6875 
 L 18.40625 0 
@@ -878,7 +884,7 @@ L 18.40625 75.984375
 L 18.40625 64.59375 
 L 9.421875 64.59375 
 z
-" id="DejaVuSans-105" />
+" id="DejaVuSans-105"></path>
       <path d="M 52 44.1875 
 Q 55.375 50.25 60.0625 53.125 
 Q 64.75 56 71.09375 56 
@@ -908,7 +914,7 @@ Q 29.78125 56 35.6875 56
 Q 41.65625 56 45.828125 52.96875 
 Q 50 49.953125 52 44.1875 
 z
-" id="DejaVuSans-109" />
+" id="DejaVuSans-109"></path>
       <path d="M 56.203125 29.59375 
 L 56.203125 25.203125 
 L 14.890625 25.203125 
@@ -932,13 +938,13 @@ Q 39.0625 48.390625 32.421875 48.390625
 Q 24.90625 48.390625 20.390625 44.140625 
 Q 15.875 39.890625 15.1875 32.171875 
 z
-" id="DejaVuSans-101" />
+" id="DejaVuSans-101"></path>
      </defs>
      <g transform="translate(181.948125 274.529375)scale(0.14 -0.14)">
-      <use xlink:href="#DejaVuSans-84" />
-      <use x="61.037109" xlink:href="#DejaVuSans-105" />
-      <use x="88.820312" xlink:href="#DejaVuSans-109" />
-      <use x="186.232422" xlink:href="#DejaVuSans-101" />
+      <use xlink:href="#DejaVuSans-84"></use>
+      <use x="61.037109" xlink:href="#DejaVuSans-105"></use>
+      <use x="88.820312" xlink:href="#DejaVuSans-109"></use>
+      <use x="186.232422" xlink:href="#DejaVuSans-101"></use>
      </g>
     </g>
    </g>
@@ -948,10 +954,10 @@ z
       <defs>
        <path d="M 0 0 
 L -3.5 0 
-" id="ma724558c7c" style="stroke:#000000;stroke-width:0.8;" />
+" id="ma724558c7c" style="stroke:#000000;stroke-width:0.8;"></path>
       </defs>
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="204.018207" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="204.018207"></use>
       </g>
      </g>
      <g id="text_6">
@@ -962,57 +968,57 @@ L 73.1875 35.5
 L 73.1875 27.203125 
 L 10.59375 27.203125 
 z
-" id="DejaVuSans-8722" />
+" id="DejaVuSans-8722"></path>
       </defs>
       <g transform="translate(7.2 208.57727)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-8722" />
-       <use x="83.789062" xlink:href="#DejaVuSans-50" />
+       <use xlink:href="#DejaVuSans-8722"></use>
+       <use x="83.789062" xlink:href="#DejaVuSans-50"></use>
       </g>
      </g>
     </g>
     <g id="ytick_2">
      <g id="line2d_6">
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="164.600948" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="164.600948"></use>
       </g>
      </g>
      <g id="text_7">
       <!-- 0 -->
       <g transform="translate(17.255625 169.16001)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-48" />
+       <use xlink:href="#DejaVuSans-48"></use>
       </g>
      </g>
     </g>
     <g id="ytick_3">
      <g id="line2d_7">
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="125.183689" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="125.183689"></use>
       </g>
      </g>
      <g id="text_8">
       <!-- 2 -->
       <g transform="translate(17.255625 129.742751)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-50" />
+       <use xlink:href="#DejaVuSans-50"></use>
       </g>
      </g>
     </g>
     <g id="ytick_4">
      <g id="line2d_8">
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="85.766429" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="85.766429"></use>
       </g>
      </g>
      <g id="text_9">
       <!-- 4 -->
       <g transform="translate(17.255625 90.325492)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-52" />
+       <use xlink:href="#DejaVuSans-52"></use>
       </g>
      </g>
     </g>
     <g id="ytick_5">
      <g id="line2d_9">
       <g>
-       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="46.34917" />
+       <use style="stroke:#000000;stroke-width:0.8;" x="31.890625" xlink:href="#ma724558c7c" y="46.34917"></use>
       </g>
      </g>
      <g id="text_10">
@@ -1047,10 +1053,10 @@ Q 23.390625 74.21875 37.203125 74.21875
 Q 40.921875 74.21875 44.703125 73.484375 
 Q 48.484375 72.75 52.59375 71.296875 
 z
-" id="DejaVuSans-54" />
+" id="DejaVuSans-54"></path>
       </defs>
       <g transform="translate(17.255625 50.908233)scale(0.12 -0.12)">
-       <use xlink:href="#DejaVuSans-54" />
+       <use xlink:href="#DejaVuSans-54"></use>
       </g>
      </g>
     </g>
@@ -1067,29 +1073,29 @@ C -4.473168 -2.597899 -5 -1.326016 -5 0
 C -5 1.326016 -4.473168 2.597899 -3.535534 3.535534 
 C -2.597899 4.473168 -1.326016 5 0 5 
 z
-" id="mea819fdfe2" style="stroke:#0000ff;" />
+" id="mea819fdfe2" style="stroke:#0000ff;"></path>
     </defs>
     <g clip-path="url(#p82d3d07fcd)">
-     <use style="fill:#0000ff;stroke:#0000ff;" x="47.108807" xlink:href="#mea819fdfe2" y="231.394176" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="62.326989" xlink:href="#mea819fdfe2" y="223.542129" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="77.54517" xlink:href="#mea819fdfe2" y="205.070872" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="92.763352" xlink:href="#mea819fdfe2" y="178.836158" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="107.981534" xlink:href="#mea819fdfe2" y="149.713386" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="123.199716" xlink:href="#mea819fdfe2" y="123.308135" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="138.417898" xlink:href="#mea819fdfe2" y="104.470951" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="153.63608" xlink:href="#mea819fdfe2" y="96.016168" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="168.854261" xlink:href="#mea819fdfe2" y="97.989573" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="184.072443" xlink:href="#mea819fdfe2" y="107.681875" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="199.290625" xlink:href="#mea819fdfe2" y="120.384042" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="214.508807" xlink:href="#mea819fdfe2" y="130.680774" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="229.726989" xlink:href="#mea819fdfe2" y="133.933406" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="244.94517" xlink:href="#mea819fdfe2" y="127.552512" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="260.163352" xlink:href="#mea819fdfe2" y="111.717171" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="275.381534" xlink:href="#mea819fdfe2" y="89.346871" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="290.599716" xlink:href="#mea819fdfe2" y="65.333364" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="305.817898" xlink:href="#mea819fdfe2" y="45.239136" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="321.03608" xlink:href="#mea819fdfe2" y="33.812855" />
-     <use style="fill:#0000ff;stroke:#0000ff;" x="336.254261" xlink:href="#mea819fdfe2" y="33.721449" />
+     <use style="fill:#0000ff;stroke:#0000ff;" x="47.108807" xlink:href="#mea819fdfe2" y="231.394176"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="62.326989" xlink:href="#mea819fdfe2" y="223.542129"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="77.54517" xlink:href="#mea819fdfe2" y="205.070872"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="92.763352" xlink:href="#mea819fdfe2" y="178.836158"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="107.981534" xlink:href="#mea819fdfe2" y="149.713386"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="123.199716" xlink:href="#mea819fdfe2" y="123.308135"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="138.417898" xlink:href="#mea819fdfe2" y="104.470951"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="153.63608" xlink:href="#mea819fdfe2" y="96.016168"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="168.854261" xlink:href="#mea819fdfe2" y="97.989573"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="184.072443" xlink:href="#mea819fdfe2" y="107.681875"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="199.290625" xlink:href="#mea819fdfe2" y="120.384042"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="214.508807" xlink:href="#mea819fdfe2" y="130.680774"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="229.726989" xlink:href="#mea819fdfe2" y="133.933406"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="244.94517" xlink:href="#mea819fdfe2" y="127.552512"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="260.163352" xlink:href="#mea819fdfe2" y="111.717171"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="275.381534" xlink:href="#mea819fdfe2" y="89.346871"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="290.599716" xlink:href="#mea819fdfe2" y="65.333364"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="305.817898" xlink:href="#mea819fdfe2" y="45.239136"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="321.03608" xlink:href="#mea819fdfe2" y="33.812855"></use>
+     <use style="fill:#0000ff;stroke:#0000ff;" x="336.254261" xlink:href="#mea819fdfe2" y="33.721449"></use>
     </g>
    </g>
    <g id="line2d_11">
@@ -1105,29 +1111,29 @@ L 1.816356 0.59017
 L 4.755283 -1.545085 
 L 1.12257 -1.545085 
 z
-" id="m627b4b924d" style="stroke:#ffffff;stroke-linejoin:bevel;" />
+" id="m627b4b924d" style="stroke:#ffffff;stroke-linejoin:bevel;"></path>
     </defs>
     <g clip-path="url(#p82d3d07fcd)">
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="62.326989" xlink:href="#m627b4b924d" y="223.542129" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="77.54517" xlink:href="#m627b4b924d" y="205.070872" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="92.763352" xlink:href="#m627b4b924d" y="178.836158" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="107.981534" xlink:href="#m627b4b924d" y="149.713386" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="123.199716" xlink:href="#m627b4b924d" y="123.308135" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="138.417898" xlink:href="#m627b4b924d" y="104.470951" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="153.63608" xlink:href="#m627b4b924d" y="96.016168" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="168.854261" xlink:href="#m627b4b924d" y="97.989573" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="184.072443" xlink:href="#m627b4b924d" y="107.681875" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="199.290625" xlink:href="#m627b4b924d" y="120.384042" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="214.508807" xlink:href="#m627b4b924d" y="130.680774" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="229.726989" xlink:href="#m627b4b924d" y="133.933406" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="244.94517" xlink:href="#m627b4b924d" y="127.552512" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="260.163352" xlink:href="#m627b4b924d" y="111.717171" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="275.381534" xlink:href="#m627b4b924d" y="89.346871" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="290.599716" xlink:href="#m627b4b924d" y="65.333364" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="305.817898" xlink:href="#m627b4b924d" y="45.239136" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="321.03608" xlink:href="#m627b4b924d" y="33.812855" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="336.254261" xlink:href="#m627b4b924d" y="33.721449" />
-     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="351.472443" xlink:href="#m627b4b924d" y="44.840194" />
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="62.326989" xlink:href="#m627b4b924d" y="223.542129"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="77.54517" xlink:href="#m627b4b924d" y="205.070872"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="92.763352" xlink:href="#m627b4b924d" y="178.836158"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="107.981534" xlink:href="#m627b4b924d" y="149.713386"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="123.199716" xlink:href="#m627b4b924d" y="123.308135"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="138.417898" xlink:href="#m627b4b924d" y="104.470951"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="153.63608" xlink:href="#m627b4b924d" y="96.016168"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="168.854261" xlink:href="#m627b4b924d" y="97.989573"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="184.072443" xlink:href="#m627b4b924d" y="107.681875"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="199.290625" xlink:href="#m627b4b924d" y="120.384042"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="214.508807" xlink:href="#m627b4b924d" y="130.680774"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="229.726989" xlink:href="#m627b4b924d" y="133.933406"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="244.94517" xlink:href="#m627b4b924d" y="127.552512"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="260.163352" xlink:href="#m627b4b924d" y="111.717171"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="275.381534" xlink:href="#m627b4b924d" y="89.346871"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="290.599716" xlink:href="#m627b4b924d" y="65.333364"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="305.817898" xlink:href="#m627b4b924d" y="45.239136"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="321.03608" xlink:href="#m627b4b924d" y="33.812855"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="336.254261" xlink:href="#m627b4b924d" y="33.721449"></use>
+     <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="351.472443" xlink:href="#m627b4b924d" y="44.840194"></use>
     </g>
    </g>
    <g id="line2d_12">
@@ -1142,50 +1148,50 @@ C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0
 C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
 C -1.29895 2.236584 -0.663008 2.5 0 2.5 
 z
-" id="mc42a00adea" style="stroke:#ff0000;" />
+" id="mc42a00adea" style="stroke:#ff0000;"></path>
     </defs>
     <g clip-path="url(#p82d3d07fcd)">
-     <use style="fill:#ff0000;stroke:#ff0000;" x="62.326989" xlink:href="#mc42a00adea" y="199.042487" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="77.54517" xlink:href="#mc42a00adea" y="195.728357" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="92.763352" xlink:href="#mc42a00adea" y="174.073978" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="107.981534" xlink:href="#mc42a00adea" y="164.82086" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="123.199716" xlink:href="#mc42a00adea" y="140.230776" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="138.417898" xlink:href="#mc42a00adea" y="136.272765" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="153.63608" xlink:href="#mc42a00adea" y="136.606812" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="168.854261" xlink:href="#mc42a00adea" y="124.353449" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="184.072443" xlink:href="#mc42a00adea" y="133.968385" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="199.290625" xlink:href="#mc42a00adea" y="149.392308" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="214.508807" xlink:href="#mc42a00adea" y="153.70369" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="229.726989" xlink:href="#mc42a00adea" y="155.66239" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="244.94517" xlink:href="#mc42a00adea" y="131.746119" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="260.163352" xlink:href="#mc42a00adea" y="107.431006" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="275.381534" xlink:href="#mc42a00adea" y="100.400046" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="290.599716" xlink:href="#mc42a00adea" y="92.269143" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="305.817898" xlink:href="#mc42a00adea" y="73.854098" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="321.03608" xlink:href="#mc42a00adea" y="71.280706" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="336.254261" xlink:href="#mc42a00adea" y="83.595827" />
-     <use style="fill:#ff0000;stroke:#ff0000;" x="351.472443" xlink:href="#mc42a00adea" y="102.421481" />
+     <use style="fill:#ff0000;stroke:#ff0000;" x="62.326989" xlink:href="#mc42a00adea" y="199.042487"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="77.54517" xlink:href="#mc42a00adea" y="195.728357"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="92.763352" xlink:href="#mc42a00adea" y="174.073978"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="107.981534" xlink:href="#mc42a00adea" y="164.82086"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="123.199716" xlink:href="#mc42a00adea" y="140.230776"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="138.417898" xlink:href="#mc42a00adea" y="136.272765"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="153.63608" xlink:href="#mc42a00adea" y="136.606812"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="168.854261" xlink:href="#mc42a00adea" y="124.353449"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="184.072443" xlink:href="#mc42a00adea" y="133.968385"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="199.290625" xlink:href="#mc42a00adea" y="149.392308"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="214.508807" xlink:href="#mc42a00adea" y="153.70369"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="229.726989" xlink:href="#mc42a00adea" y="155.66239"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="244.94517" xlink:href="#mc42a00adea" y="131.746119"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="260.163352" xlink:href="#mc42a00adea" y="107.431006"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="275.381534" xlink:href="#mc42a00adea" y="100.400046"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="290.599716" xlink:href="#mc42a00adea" y="92.269143"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="305.817898" xlink:href="#mc42a00adea" y="73.854098"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="321.03608" xlink:href="#mc42a00adea" y="71.280706"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="336.254261" xlink:href="#mc42a00adea" y="83.595827"></use>
+     <use style="fill:#ff0000;stroke:#ff0000;" x="351.472443" xlink:href="#mc42a00adea" y="102.421481"></use>
     </g>
    </g>
    <g id="patch_3">
     <path d="M 31.890625 241.277812 
 L 31.890625 23.837812 
-" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;" />
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"></path>
    </g>
    <g id="patch_4">
     <path d="M 366.690625 241.277812 
 L 366.690625 23.837812 
-" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;" />
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"></path>
    </g>
    <g id="patch_5">
     <path d="M 31.890625 241.277813 
 L 366.690625 241.277813 
-" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;" />
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"></path>
    </g>
    <g id="patch_6">
     <path d="M 31.890625 23.837812 
 L 366.690625 23.837812 
-" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;" />
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;stroke-width:0.8;"></path>
    </g>
    <g id="text_11">
     <!-- Testing the model -->
@@ -1220,7 +1226,7 @@ Q 16.75 56 26.8125 56
 Q 31.78125 56 36.171875 55.265625 
 Q 40.578125 54.546875 44.28125 53.078125 
 z
-" id="DejaVuSans-115" />
+" id="DejaVuSans-115"></path>
      <path d="M 18.3125 70.21875 
 L 18.3125 54.6875 
 L 36.8125 54.6875 
@@ -1240,7 +1246,7 @@ L 2.6875 54.6875
 L 9.28125 54.6875 
 L 9.28125 70.21875 
 z
-" id="DejaVuSans-116" />
+" id="DejaVuSans-116"></path>
      <path d="M 54.890625 33.015625 
 L 54.890625 0 
 L 45.90625 0 
@@ -1259,7 +1265,7 @@ Q 30.078125 56 35.796875 56
 Q 45.21875 56 50.046875 50.171875 
 Q 54.890625 44.34375 54.890625 33.015625 
 z
-" id="DejaVuSans-110" />
+" id="DejaVuSans-110"></path>
      <path d="M 45.40625 27.984375 
 Q 45.40625 37.75 41.375 43.109375 
 Q 37.359375 48.484375 30.078125 48.484375 
@@ -1292,8 +1298,8 @@ Q 42.625 51.21875 45.40625 46.390625
 L 45.40625 54.6875 
 L 54.390625 54.6875 
 z
-" id="DejaVuSans-103" />
-     <path id="DejaVuSans-32" />
+" id="DejaVuSans-103"></path>
+     <path id="DejaVuSans-32"></path>
      <path d="M 54.890625 33.015625 
 L 54.890625 0 
 L 45.90625 0 
@@ -1312,7 +1318,7 @@ Q 30.078125 56 35.796875 56
 Q 45.21875 56 50.046875 50.171875 
 Q 54.890625 44.34375 54.890625 33.015625 
 z
-" id="DejaVuSans-104" />
+" id="DejaVuSans-104"></path>
      <path d="M 30.609375 48.390625 
 Q 23.390625 48.390625 19.1875 42.75 
 Q 14.984375 37.109375 14.984375 27.296875 
@@ -1333,7 +1339,7 @@ Q 5.515625 13.875 5.515625 27.296875
 Q 5.515625 40.765625 12.171875 48.375 
 Q 18.84375 56 30.609375 56 
 z
-" id="DejaVuSans-111" />
+" id="DejaVuSans-111"></path>
      <path d="M 45.40625 46.390625 
 L 45.40625 75.984375 
 L 54.390625 75.984375 
@@ -1359,32 +1365,32 @@ Q 37.203125 48.484375 30.078125 48.484375
 Q 22.953125 48.484375 18.875 42.84375 
 Q 14.796875 37.203125 14.796875 27.296875 
 z
-" id="DejaVuSans-100" />
+" id="DejaVuSans-100"></path>
      <path d="M 9.421875 75.984375 
 L 18.40625 75.984375 
 L 18.40625 0 
 L 9.421875 0 
 z
-" id="DejaVuSans-108" />
+" id="DejaVuSans-108"></path>
     </defs>
     <g transform="translate(135.776563 17.837812)scale(0.14 -0.14)">
-     <use xlink:href="#DejaVuSans-84" />
-     <use x="60.818359" xlink:href="#DejaVuSans-101" />
-     <use x="122.341797" xlink:href="#DejaVuSans-115" />
-     <use x="174.441406" xlink:href="#DejaVuSans-116" />
-     <use x="213.650391" xlink:href="#DejaVuSans-105" />
-     <use x="241.433594" xlink:href="#DejaVuSans-110" />
-     <use x="304.8125" xlink:href="#DejaVuSans-103" />
-     <use x="368.289062" xlink:href="#DejaVuSans-32" />
-     <use x="400.076172" xlink:href="#DejaVuSans-116" />
-     <use x="439.285156" xlink:href="#DejaVuSans-104" />
-     <use x="502.664062" xlink:href="#DejaVuSans-101" />
-     <use x="564.1875" xlink:href="#DejaVuSans-32" />
-     <use x="595.974609" xlink:href="#DejaVuSans-109" />
-     <use x="693.386719" xlink:href="#DejaVuSans-111" />
-     <use x="754.568359" xlink:href="#DejaVuSans-100" />
-     <use x="818.044922" xlink:href="#DejaVuSans-101" />
-     <use x="879.568359" xlink:href="#DejaVuSans-108" />
+     <use xlink:href="#DejaVuSans-84"></use>
+     <use x="60.818359" xlink:href="#DejaVuSans-101"></use>
+     <use x="122.341797" xlink:href="#DejaVuSans-115"></use>
+     <use x="174.441406" xlink:href="#DejaVuSans-116"></use>
+     <use x="213.650391" xlink:href="#DejaVuSans-105"></use>
+     <use x="241.433594" xlink:href="#DejaVuSans-110"></use>
+     <use x="304.8125" xlink:href="#DejaVuSans-103"></use>
+     <use x="368.289062" xlink:href="#DejaVuSans-32"></use>
+     <use x="400.076172" xlink:href="#DejaVuSans-116"></use>
+     <use x="439.285156" xlink:href="#DejaVuSans-104"></use>
+     <use x="502.664062" xlink:href="#DejaVuSans-101"></use>
+     <use x="564.1875" xlink:href="#DejaVuSans-32"></use>
+     <use x="595.974609" xlink:href="#DejaVuSans-109"></use>
+     <use x="693.386719" xlink:href="#DejaVuSans-111"></use>
+     <use x="754.568359" xlink:href="#DejaVuSans-100"></use>
+     <use x="818.044922" xlink:href="#DejaVuSans-101"></use>
+     <use x="879.568359" xlink:href="#DejaVuSans-108"></use>
     </g>
    </g>
    <g id="legend_1">
@@ -1399,12 +1405,12 @@ Q 36.890625 28.837812 36.890625 30.837812
 L 36.890625 73.872187 
 Q 36.890625 75.872187 38.890625 75.872187 
 z
-" style="fill:#ffffff;opacity:0.8;stroke:#cccccc;stroke-linejoin:miter;" />
+" style="fill:#ffffff;opacity:0.8;stroke:#cccccc;stroke-linejoin:miter;"></path>
     </g>
-    <g id="line2d_13" />
+    <g id="line2d_13"></g>
     <g id="line2d_14">
      <g>
-      <use style="fill:#0000ff;stroke:#0000ff;" x="50.890625" xlink:href="#mea819fdfe2" y="36.93625" />
+      <use style="fill:#0000ff;stroke:#0000ff;" x="50.890625" xlink:href="#mea819fdfe2" y="36.93625"></use>
      </g>
     </g>
     <g id="text_12">
@@ -1441,7 +1447,7 @@ Q 24.21875 56 28.609375 56
 Q 40.484375 56 46.34375 49.84375 
 Q 52.203125 43.703125 52.203125 31.203125 
 z
-" id="DejaVuSans-97" />
+" id="DejaVuSans-97"></path>
       <path d="M 48.78125 52.59375 
 L 48.78125 44.1875 
 Q 44.96875 46.296875 41.140625 47.34375 
@@ -1462,23 +1468,23 @@ Q 20.21875 56 33.015625 56
 Q 37.15625 56 41.109375 55.140625 
 Q 45.0625 54.296875 48.78125 52.59375 
 z
-" id="DejaVuSans-99" />
+" id="DejaVuSans-99"></path>
      </defs>
      <g transform="translate(68.890625 40.43625)scale(0.1 -0.1)">
-      <use xlink:href="#DejaVuSans-105" />
-      <use x="27.783203" xlink:href="#DejaVuSans-110" />
-      <use x="91.162109" xlink:href="#DejaVuSans-115" />
-      <use x="143.261719" xlink:href="#DejaVuSans-116" />
-      <use x="182.470703" xlink:href="#DejaVuSans-97" />
-      <use x="243.75" xlink:href="#DejaVuSans-110" />
-      <use x="307.128906" xlink:href="#DejaVuSans-99" />
-      <use x="362.109375" xlink:href="#DejaVuSans-101" />
+      <use xlink:href="#DejaVuSans-105"></use>
+      <use x="27.783203" xlink:href="#DejaVuSans-110"></use>
+      <use x="91.162109" xlink:href="#DejaVuSans-115"></use>
+      <use x="143.261719" xlink:href="#DejaVuSans-116"></use>
+      <use x="182.470703" xlink:href="#DejaVuSans-97"></use>
+      <use x="243.75" xlink:href="#DejaVuSans-110"></use>
+      <use x="307.128906" xlink:href="#DejaVuSans-99"></use>
+      <use x="362.109375" xlink:href="#DejaVuSans-101"></use>
      </g>
     </g>
-    <g id="line2d_15" />
+    <g id="line2d_15"></g>
     <g id="line2d_16">
      <g>
-      <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="50.890625" xlink:href="#m627b4b924d" y="51.614375" />
+      <use style="fill:#ffffff;stroke:#ffffff;stroke-linejoin:bevel;" x="50.890625" xlink:href="#m627b4b924d" y="51.614375"></use>
      </g>
     </g>
     <g id="text_13">
@@ -1499,21 +1505,21 @@ Q 30.03125 56 36.53125 56
 Q 37.453125 56 38.578125 55.875 
 Q 39.703125 55.765625 41.0625 55.515625 
 z
-" id="DejaVuSans-114" />
+" id="DejaVuSans-114"></path>
      </defs>
      <g transform="translate(68.890625 55.114375)scale(0.1 -0.1)">
-      <use xlink:href="#DejaVuSans-116" />
-      <use x="39.208984" xlink:href="#DejaVuSans-97" />
-      <use x="100.488281" xlink:href="#DejaVuSans-114" />
-      <use x="141.585938" xlink:href="#DejaVuSans-103" />
-      <use x="205.0625" xlink:href="#DejaVuSans-101" />
-      <use x="266.585938" xlink:href="#DejaVuSans-116" />
+      <use xlink:href="#DejaVuSans-116"></use>
+      <use x="39.208984" xlink:href="#DejaVuSans-97"></use>
+      <use x="100.488281" xlink:href="#DejaVuSans-114"></use>
+      <use x="141.585938" xlink:href="#DejaVuSans-103"></use>
+      <use x="205.0625" xlink:href="#DejaVuSans-101"></use>
+      <use x="266.585938" xlink:href="#DejaVuSans-116"></use>
      </g>
     </g>
-    <g id="line2d_17" />
+    <g id="line2d_17"></g>
     <g id="line2d_18">
      <g>
-      <use style="fill:#ff0000;stroke:#ff0000;" x="50.890625" xlink:href="#mc42a00adea" y="66.2925" />
+      <use style="fill:#ff0000;stroke:#ff0000;" x="50.890625" xlink:href="#mc42a00adea" y="66.2925"></use>
      </g>
     </g>
     <g id="text_14">
@@ -1544,28 +1550,28 @@ Q 26.265625 6.109375 33.40625 6.109375
 Q 40.53125 6.109375 44.609375 11.75 
 Q 48.6875 17.390625 48.6875 27.296875 
 z
-" id="DejaVuSans-112" />
+" id="DejaVuSans-112"></path>
      </defs>
      <g transform="translate(68.890625 69.7925)scale(0.1 -0.1)">
-      <use xlink:href="#DejaVuSans-112" />
-      <use x="63.476562" xlink:href="#DejaVuSans-114" />
-      <use x="104.558594" xlink:href="#DejaVuSans-101" />
-      <use x="166.082031" xlink:href="#DejaVuSans-100" />
-      <use x="229.558594" xlink:href="#DejaVuSans-105" />
-      <use x="257.341797" xlink:href="#DejaVuSans-99" />
-      <use x="312.322266" xlink:href="#DejaVuSans-116" />
-      <use x="351.53125" xlink:href="#DejaVuSans-105" />
-      <use x="379.314453" xlink:href="#DejaVuSans-111" />
-      <use x="440.496094" xlink:href="#DejaVuSans-110" />
+      <use xlink:href="#DejaVuSans-112"></use>
+      <use x="63.476562" xlink:href="#DejaVuSans-114"></use>
+      <use x="104.558594" xlink:href="#DejaVuSans-101"></use>
+      <use x="166.082031" xlink:href="#DejaVuSans-100"></use>
+      <use x="229.558594" xlink:href="#DejaVuSans-105"></use>
+      <use x="257.341797" xlink:href="#DejaVuSans-99"></use>
+      <use x="312.322266" xlink:href="#DejaVuSans-116"></use>
+      <use x="351.53125" xlink:href="#DejaVuSans-105"></use>
+      <use x="379.314453" xlink:href="#DejaVuSans-111"></use>
+      <use x="440.496094" xlink:href="#DejaVuSans-110"></use>
      </g>
     </g>
    </g>
   </g>
  </g>
  <defs>
-  <clipPath id="p82d3d07fcd">
-   <rect height="217.44" width="334.8" x="31.890625" y="23.837812" />
-  </clipPath>
+  <clippath id="p82d3d07fcd">
+   <rect height="217.44" width="334.8" x="31.890625" y="23.837812"></rect>
+  </clippath>
  </defs>
 </svg>
 
@@ -1579,16 +1585,21 @@ z
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Oops, it seems that Dropout does not help at all in this particular case.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Handling-long-sequences">Handling long sequences<a class="anchor-link" href="#Handling-long-sequences"> </a></h2><p>To train an RNN on long sequences, you will need to run it over many time steps, making the unrolled RNN a very deep network. Just like any deep neural network it may suffer from the vanishing/exploding gradients problem and take forever to train. Many of the tricks to alleviate this problem can be used for deep unrolled RNNs as well: good parameter initialization,
+<h2 id="Handling-long-sequences">
+<a class="anchor" href="#Handling-long-sequences" aria-hidden="true"><span class="octicon octicon-link"></span></a>Handling long sequences<a class="anchor-link" href="#Handling-long-sequences"> </a>
+</h2>
+<p>To train an RNN on long sequences, you will need to run it over many time steps, making the unrolled RNN a very deep network. Just like any deep neural network it may suffer from the vanishing/exploding gradients problem and take forever to train. Many of the tricks to alleviate this problem can be used for deep unrolled RNNs as well: good parameter initialization,
 nonsaturating activation functions (e.g., ReLU), Batch Normalization, Gradient Clipping, and faster optimizers. However, if the RNN needs to handle even moderately long sequences (e.g., 100 inputs), then training will still be very slow.</p>
 <p>The simplest and most common solution to this problem is to unroll the RNN only
 over a limited number of time steps during training. This is called truncated backpropagation
@@ -1603,13 +1614,17 @@ lost after each time step.</p>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="LSTM">LSTM<a class="anchor-link" href="#LSTM"> </a></h2>
+<h2 id="LSTM">
+<a class="anchor" href="#LSTM" aria-hidden="true"><span class="octicon octicon-link"></span></a>LSTM<a class="anchor-link" href="#LSTM"> </a>
+</h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>If you consider the LSTM cell as a black box, it can be used very much like a basic cell,
 except it will perform much better; training will converge faster and it will detect
@@ -1627,7 +1642,7 @@ Cell instead of a BasicRNNCell:</p>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">tensorflow.examples.tutorials.mnist</span> <span class="kn">import</span> <span class="n">input_data</span>
-<span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s2">&quot;/tmp/data/&quot;</span><span class="p">)</span>
+<span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s2">"/tmp/data/"</span><span class="p">)</span>
 <span class="n">X_test</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">n_inputs</span><span class="p">))</span>
 <span class="n">y_test</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">test</span><span class="o">.</span><span class="n">labels</span>
 </pre></div>
@@ -1704,9 +1719,9 @@ Extracting /tmp/data/t10k-labels-idx1-ubyte.gz
 <span class="n">multi_cell</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">rnn_cell</span><span class="o">.</span><span class="n">MultiRNNCell</span><span class="p">(</span><span class="n">lstm_cells</span><span class="p">)</span>
 <span class="n">outputs</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dynamic_rnn</span><span class="p">(</span><span class="n">multi_cell</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">top_layer_h_state</span> <span class="o">=</span> <span class="n">states</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">logits</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">top_layer_h_state</span><span class="p">,</span> <span class="n">n_outputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;softmax&quot;</span><span class="p">)</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">top_layer_h_state</span><span class="p">,</span> <span class="n">n_outputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"softmax"</span><span class="p">)</span>
 <span class="n">xentropy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">sparse_softmax_cross_entropy_with_logits</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">xentropy</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">xentropy</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"loss"</span><span class="p">)</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
 <span class="n">training_op</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
 <span class="n">correct</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">in_top_k</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -1744,9 +1759,9 @@ Extracting /tmp/data/t10k-labels-idx1-ubyte.gz
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>(LSTMStateTuple(c=&lt;tf.Tensor &#39;rnn/while/Exit_3:0&#39; shape=(?, 150) dtype=float32&gt;, h=&lt;tf.Tensor &#39;rnn/while/Exit_4:0&#39; shape=(?, 150) dtype=float32&gt;),
- LSTMStateTuple(c=&lt;tf.Tensor &#39;rnn/while/Exit_5:0&#39; shape=(?, 150) dtype=float32&gt;, h=&lt;tf.Tensor &#39;rnn/while/Exit_6:0&#39; shape=(?, 150) dtype=float32&gt;),
- LSTMStateTuple(c=&lt;tf.Tensor &#39;rnn/while/Exit_7:0&#39; shape=(?, 150) dtype=float32&gt;, h=&lt;tf.Tensor &#39;rnn/while/Exit_8:0&#39; shape=(?, 150) dtype=float32&gt;))</pre>
+<pre>(LSTMStateTuple(c=&lt;tf.Tensor 'rnn/while/Exit_3:0' shape=(?, 150) dtype=float32&gt;, h=&lt;tf.Tensor 'rnn/while/Exit_4:0' shape=(?, 150) dtype=float32&gt;),
+ LSTMStateTuple(c=&lt;tf.Tensor 'rnn/while/Exit_5:0' shape=(?, 150) dtype=float32&gt;, h=&lt;tf.Tensor 'rnn/while/Exit_6:0' shape=(?, 150) dtype=float32&gt;),
+ LSTMStateTuple(c=&lt;tf.Tensor 'rnn/while/Exit_7:0' shape=(?, 150) dtype=float32&gt;, h=&lt;tf.Tensor 'rnn/while/Exit_8:0' shape=(?, 150) dtype=float32&gt;))</pre>
 </div>
 
 </div>
@@ -1776,7 +1791,7 @@ Extracting /tmp/data/t10k-labels-idx1-ubyte.gz
             <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">training_op</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">y_batch</span><span class="p">})</span>
         <span class="n">acc_train</span> <span class="o">=</span> <span class="n">accuracy</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">y_batch</span><span class="p">})</span>
         <span class="n">acc_test</span> <span class="o">=</span> <span class="n">accuracy</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">y_test</span><span class="p">})</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Epoch&quot;</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">&quot;Train accuracy =&quot;</span><span class="p">,</span> <span class="n">acc_train</span><span class="p">,</span> <span class="s2">&quot;Test accuracy =&quot;</span><span class="p">,</span> <span class="n">acc_test</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Epoch"</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="s2">"Train accuracy ="</span><span class="p">,</span> <span class="n">acc_train</span><span class="p">,</span> <span class="s2">"Test accuracy ="</span><span class="p">,</span> <span class="n">acc_test</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -1809,7 +1824,8 @@ Epoch 9 Train accuracy = 0.99333334 Test accuracy = 0.9876
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>LSTM cells manage two state vectors, and for performance reasons they are kept
 separate by default. You can change this default behavior by setting
@@ -1829,7 +1845,10 @@ input gate), store it in the long-term state, learn to preserve it for as long a
 needed (that’s the role of the forget gate), and learn to extract it whenever it is needed.
 This explains why they have been amazingly successful at capturing long-term patterns
 in time series, long texts, audio recordings, and more.</p>
-<h3 id="PEEPHOLE-Connection">PEEPHOLE Connection<a class="anchor-link" href="#PEEPHOLE-Connection"> </a></h3><p>In a basic LSTM cell, the gate controllers can look only at the input x(t) and the previous
+<h3 id="PEEPHOLE-Connection">
+<a class="anchor" href="#PEEPHOLE-Connection" aria-hidden="true"><span class="octicon octicon-link"></span></a>PEEPHOLE Connection<a class="anchor-link" href="#PEEPHOLE-Connection"> </a>
+</h3>
+<p>In a basic LSTM cell, the gate controllers can look only at the input x(t) and the previous
 short-term state h(t–1). It may be a good idea to give them a bit more context by
 letting them peek at the long-term state as well. This idea was proposed by Felix Gers
 and Jürgen Schmidhuber in 2000.6 They proposed an LSTM variant with extra connections
@@ -1875,9 +1894,13 @@ This class is equivalent as tf.keras.layers.LSTMCell, and will be replaced by th
 </div>
     
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="GRU-Cells">GRU Cells<a class="anchor-link" href="#GRU-Cells"> </a></h2><p>The GRU cell is a simplified version of the LSTM cell, and it seems to perform just as
+<h2 id="GRU-Cells">
+<a class="anchor" href="#GRU-Cells" aria-hidden="true"><span class="octicon octicon-link"></span></a>GRU Cells<a class="anchor-link" href="#GRU-Cells"> </a>
+</h2>
+<p>The GRU cell is a simplified version of the LSTM cell, and it seems to perform just as
 well (which explains its growing popularity). The main simplifications are:</p>
 <p>• Both state vectors are merged into a single vector h(t).
 • A single gate controller controls both the forget gate and the input gate. If the
@@ -1954,12 +1977,12 @@ will be shown to the main layer.</p>
         <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">training_op</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">y_batch</span><span class="p">})</span>
         <span class="k">if</span> <span class="n">iteration</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">mse</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">y_batch</span><span class="p">})</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">MSE:&quot;</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">MSE:"</span><span class="p">,</span> <span class="n">mse</span><span class="p">)</span>
     
     <span class="n">X_new</span> <span class="o">=</span> <span class="n">time_series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">n_inputs</span><span class="p">)))</span>
     <span class="n">y_pred</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">X_new</span><span class="p">})</span>
     
-    <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="s2">&quot;./gru_time_series_model&quot;</span><span class="p">)</span>
+    <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="s2">"./gru_time_series_model"</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -2004,12 +2027,12 @@ will be shown to the main layer.</p>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Testing the model&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_series</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">&quot;bo&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;instance&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">time_series</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="s2">&quot;w*&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;target&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;r.&quot;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;prediction&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper left&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Testing the model"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_series</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">"bo"</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"instance"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">time_series</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="s2">"w*"</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"target"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_instance</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"r."</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"prediction"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Time"</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -2026,8 +2049,7 @@ will be shown to the main layer.</p>
 
 
 <div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-" />
+<img src="data:image/png;base64,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%0A">
 </div>
 
 </div>
@@ -2042,7 +2064,7 @@ will be shown to the main layer.</p>
 
 
 
-  </div><a class="u-url" href="/BlogEms/2020/07/23/Deep_RNN_tensorflow1.html" hidden></a>
+  </div><a class="u-url" href="/BlogEms/fastpages/jupyter/rnn/tensorflow1/2020/07/23/Deep_RNN_tensorflow1.html" hidden></a>
 </article>
       </div>
     </main><footer class="site-footer h-card">
