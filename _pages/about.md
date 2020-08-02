@@ -3,8 +3,20 @@ layout: page
 title: About Me
 permalink: /about/
 ---
+# Eduardo Muñoz Sala
 
-This is where you put the contents of your *About* page. Like all your pages, it's in [Markdown](https://guides.github.com/features/mastering-markdown/) format.
+![alt text](..\images\foto.jpg)
+
+This is my personal blog where I will be posting about machine learning and data science. Last two years I have been involved in a fascinating learning path, building some projects on ML that I am uploading to my github account. And the posts in this blog will describe some of them, explaining details or other relevant topics.
+
+## My Education
+In this [Trello board](https://trello.com/b/GnxtiFm3/studies-personal-projects-on-data-science-and-machine-learning) there is a complete list of certificates, specializations and courses I have complete last two years. 
+
+And there are links to some of my projects and blog posts on Medium.
+
+This board is changing and evolving.
+
+-------------
 
 This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
 
