@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>A guide on Recurrent Neural Networks: Character-level Text Generator | fastpages</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="A guide on Recurrent Neural Networks: Character-level Text Generator" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A simple RNN model with PyTorch to familiarize ourselves with the PyTorch library and get started with RNNs. The goal is to build a model that can complete your sentence based on a few characters or a word used as input. In the second part, next post, we will train this model in Amazon SageMaker" />
+<meta property="og:description" content="A simple RNN model with PyTorch to familiarize ourselves with the PyTorch library and get started with RNNs. The goal is to build a model that can complete your sentence based on a few characters or a word used as input. In the second part, next post, we will train this model in Amazon SageMaker" />
+<link rel="canonical" href="https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html" />
+<meta property="og:url" content="https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-03T00:00:00-05:00" />
+<script type="application/ld+json">
+{"headline":"A guide on Recurrent Neural Networks: Character-level Text Generator","description":"A simple RNN model with PyTorch to familiarize ourselves with the PyTorch library and get started with RNNs. The goal is to build a model that can complete your sentence based on a few characters or a word used as input. In the second part, next post, we will train this model in Amazon SageMaker","datePublished":"2020-09-03T00:00:00-05:00","dateModified":"2020-09-03T00:00:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html"},"url":"https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/BlogEms/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://edumunozsala.github.io/BlogEms/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/BlogEms/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>A guide on Recurrent Neural Networks: Character-level Text Generator | fastpages</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="A guide on Recurrent Neural Networks: Character-level Text Generator" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A simple RNN model with PyTorch to familiarize ourselves with the PyTorch library and get started with RNNs. The goal is to build a model that can complete your sentence based on a few characters or a word used as input. In the second part, next post, we will train this model in Amazon SageMaker" />
+<meta property="og:description" content="A simple RNN model with PyTorch to familiarize ourselves with the PyTorch library and get started with RNNs. The goal is to build a model that can complete your sentence based on a few characters or a word used as input. In the second part, next post, we will train this model in Amazon SageMaker" />
+<link rel="canonical" href="https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html" />
+<meta property="og:url" content="https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-03T00:00:00-05:00" />
+<script type="application/ld+json">
+{"headline":"A guide on Recurrent Neural Networks: Character-level Text Generator","description":"A simple RNN model with PyTorch to familiarize ourselves with the PyTorch library and get started with RNNs. The goal is to build a model that can complete your sentence based on a few characters or a word used as input. In the second part, next post, we will train this model in Amazon SageMaker","datePublished":"2020-09-03T00:00:00-05:00","dateModified":"2020-09-03T00:00:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html"},"url":"https://edumunozsala.github.io/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://edumunozsala.github.io/BlogEms/feed.xml" title="fastpages" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/BlogEms/">fastpages</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/BlogEms/about/">About Me</a><a class="page-link" href="/BlogEms/search/">Search</a><a class="page-link" href="/BlogEms/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">A guide on Recurrent Neural Networks: Character-level Text Generator</h1><p class="page-description">A simple RNN model with PyTorch to familiarize ourselves with the PyTorch library and get started with RNNs. The goal is to build a model that can complete your sentence based on a few characters or a word used as input. In the second part, next post, we will train this model in Amazon SageMaker</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-09-03T00:00:00-05:00" itemprop="datePublished">
+        Sep 3, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      23 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#fastpages">fastpages</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#jupyter">jupyter</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#RNN">RNN</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#LSTM">LSTM</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#Pytorch">Pytorch</a>
+        
+      
+      </p>
+    
+
+    
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#Character-level-text-generator-with-Pytorch-using-Long-Short-Term-Memory-Units">Character-level text generator with Pytorch using Long Short-Term Memory Units </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Importing-the-libraries">Importing the libraries </a></li>
+<li class="toc-entry toc-h3"><a href="#Loading-the-dataset">Loading the dataset </a></li>
+<li class="toc-entry toc-h3"><a href="#Cleaning-the-input-data">Cleaning the input data </a></li>
+<li class="toc-entry toc-h3"><a href="#Creating-the-dictionary">Creating the dictionary </a></li>
+<li class="toc-entry toc-h3"><a href="#Save-the-dictionary">Save the dictionary </a></li>
+<li class="toc-entry toc-h3"><a href="#Create-the-input-data-and-labels-for-training">Create the input data and labels for training </a></li>
+<li class="toc-entry toc-h2"><a href="#Create-a-batch-data-generator">Create a batch data generator </a></li>
+<li class="toc-entry toc-h2"><a href="#Define-the-RNN-model">Define the RNN model </a></li>
+<li class="toc-entry toc-h2"><a href="#Training-the-model">Training the model </a></li>
+<li class="toc-entry toc-h2"><a href="#Predict-an-input-sequence">Predict an input sequence </a></li>
+</ul>
+</li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-09-03-char-level-text-generator-pytorch.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Character-level-text-generator-with-Pytorch-using-Long-Short-Term-Memory-Units">
+<a class="anchor" href="#Character-level-text-generator-with-Pytorch-using-Long-Short-Term-Memory-Units" aria-hidden="true"><span class="octicon octicon-link"></span></a>Character-level text generator with Pytorch using Long Short-Term Memory Units<a class="anchor-link" href="#Character-level-text-generator-with-Pytorch-using-Long-Short-Term-Memory-Units"> </a>
+</h1>
+<p>In this notebook we will be implementing a simple RNN character model with PyTorch to familiarize ourselves with the PyTorch library and get started with RNNs. The goal is to build a model that can complete your sentence based on a few characters or a word used as input.</p>
+<p>The model will be fed with a word and will predict what the next character in the sentence will be. This process will repeat itself until we generate a sentence of our desired length.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Importing-the-libraries">
+<a class="anchor" href="#Importing-the-libraries" aria-hidden="true"><span class="octicon octicon-link"></span></a>Importing the libraries<a class="anchor-link" href="#Importing-the-libraries"> </a>
+</h3>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span> <span class="k">as</span> <span class="nn">rnd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Loading-the-dataset">
+<a class="anchor" href="#Loading-the-dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>Loading the dataset<a class="anchor-link" href="#Loading-the-dataset"> </a>
+</h3>
+<p>First, we'll define the sentences that we want our model to output when fed with the first word or the first few characters. Our dataset is a text file containing Shakespeare's plays or books that we will extract sequence of chars to use as input to our model. Then our model will learn how to complete sentences like "Shakespeare would do".</p>
+<p>This dataset can be downloaded from Karpathy's Github account: <a href="https://github.com/karpathy/char-rnn/blob/master/data/tinyshakespeare/input.txt">https://github.com/karpathy/char-rnn/blob/master/data/tinyshakespeare/input.txt</a>.</p>
+<p>As in many of my notebooks, we set some variables to the data directory and filenames. If you want to run this code on your own enviroment you must change these values:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the root folder</span>
+<span class="n">root_folder</span><span class="o">=</span><span class="s1">'.'</span>
+<span class="c1"># Set the folder with the dataset</span>
+<span class="n">data_folder_name</span><span class="o">=</span><span class="s1">'data'</span>
+<span class="n">model_folder_name</span><span class="o">=</span><span class="s1">'model'</span>
+<span class="c1"># Set the filename</span>
+<span class="n">filename</span><span class="o">=</span><span class="s1">'input.txt'</span>
+
+<span class="c1"># Path to the data folder</span>
+<span class="n">DATA_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_folder</span><span class="p">,</span> <span class="n">data_folder_name</span><span class="p">))</span>
+<span class="n">model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_folder</span><span class="p">,</span> <span class="n">model_folder_name</span><span class="p">))</span>
+
+<span class="c1"># Set the path where the text for training is stored</span>
+<span class="n">train_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_PATH</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+<span class="c1"># Set a seed</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">load_text_data</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">init_dialog</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">''' Load the texts from the filename, splitting by lines and removing empty strings.</span>
+<span class="sd">        Setting init_dialog = True will remove lines where the character who is going to speak is indicated</span>
+<span class="sd">    '''</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="c1">#sentences = reader.readlines()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="c1">#if ':' not in line and line !='\n':</span>
+            <span class="k">if</span> <span class="n">init_dialog</span> <span class="ow">or</span> <span class="s1">':'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="c1"># Append the line to the sentences, removing the end of line character</span>
+                <span class="n">sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                
+    <span class="k">return</span> <span class="n">sentences</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Loading the input data, sentences from Shakespeare's plays.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sentences</span> <span class="o">=</span> <span class="n">load_text_data</span><span class="p">(</span><span class="n">train_path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Number of sentences: '</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sentences</span><span class="p">[:</span><span class="mi">20</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Number of sentences:  29723
+['Before we proceed any further, hear me speak.', '', 'Speak, speak.', '', 'You are all resolved rather to die than to famish?', '', 'Resolved. resolved.', '', 'First, you know Caius Marcius is chief enemy to the people.', '', "We know't, we know't.", '', "Let us kill him, and we'll have corn at our own price.", "Is't a verdict?", '', '', 'One word, good citizens.', '', 'We are accounted poor citizens, the patricians good.', 'would yield us but the superfluity, while it were']
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Cleaning-the-input-data">
+<a class="anchor" href="#Cleaning-the-input-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Cleaning the input data<a class="anchor-link" href="#Cleaning-the-input-data"> </a>
+</h3>
+<p>When working with text data, we usually need to perform some cleanings to prepare the data for our algorithm.This time we will start with a simple cleaning, convert to lowercase the text and remove non alphanumeric chracters (a parameter configuration).</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">clean_text</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">''' Cleaning process of the text'''</span>
+    <span class="k">if</span> <span class="n">alpha</span><span class="p">:</span>
+        <span class="c1"># Remove non alphabetic character</span>
+        <span class="n">cleaned_text</span> <span class="o">=</span> <span class="p">[</span><span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">t</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">text</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">or</span> <span class="n">t</span><span class="o">.</span><span class="n">isspace</span><span class="p">()])</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Simply lower the characters</span>
+        <span class="n">cleaned_text</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+    <span class="c1"># Remove any emoty string</span>
+    <span class="n">cleaned_text</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">cleaned_text</span> <span class="k">if</span> <span class="n">t</span><span class="o">!=</span><span class="s1">''</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">cleaned_text</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Clean the sentences</span>
+<span class="n">sentences</span> <span class="o">=</span> <span class="n">clean_text</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="c1"># Join all the sentences in a one long string</span>
+<span class="n">sentences</span> <span class="o">=</span> <span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Number of characters: '</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sentences</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Number of characters:  894876
+before we proceed any further, hear me speak. speak, speak. you are all resolved rather to die than 
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Creating-the-dictionary">
+<a class="anchor" href="#Creating-the-dictionary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating the dictionary<a class="anchor-link" href="#Creating-the-dictionary"> </a>
+</h3>
+<p>Now we'll create a dictionary out of all the characters that we have in the sentences and map them to an integer. This will allow us to convert our input characters to their respective integers (char2int) and viceversa (int2char).</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">CharVocab</span><span class="p">:</span> 
+    <span class="sd">''' Create a Vocabulary for '''</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_vocab</span><span class="p">,</span><span class="n">pad_token</span><span class="o">=</span><span class="s1">'&lt;PAD&gt;'</span><span class="p">,</span> <span class="n">eos_token</span><span class="o">=</span><span class="s1">'&lt;EOS&gt;'</span><span class="p">,</span> <span class="n">unk_token</span><span class="o">=</span><span class="s1">'&lt;UNK&gt;'</span><span class="p">):</span> <span class="c1">#Initialization of the type of vocabulary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">type_vocab</span>
+        <span class="c1">#self.int2char ={}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">int2char</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">pad_token</span> <span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">int2char</span> <span class="o">+=</span> <span class="p">[</span><span class="n">pad_token</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">eos_token</span> <span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">int2char</span> <span class="o">+=</span> <span class="p">[</span><span class="n">eos_token</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">unk_token</span> <span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">int2char</span> <span class="o">+=</span> <span class="p">[</span><span class="n">unk_token</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">char2int</span> <span class="o">=</span> <span class="p">{}</span>
+        
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>       <span class="c1">#When called, adds the values of parameters x_1 and x_2, prints and returns the result </span>
+        <span class="c1"># Join all the sentences together and extract the unique characters from the combined sentences</span>
+        <span class="n">chars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+
+        <span class="c1"># Creating a dictionary that maps integers to the characters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">int2char</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>
+
+        <span class="c1"># Creating another dictionary that maps characters to integers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">char2int</span> <span class="o">=</span> <span class="p">{</span><span class="n">char</span><span class="p">:</span> <span class="n">ind</span> <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">int2char</span><span class="p">)}</span>
+        
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">vocab</span> <span class="o">=</span> <span class="n">CharVocab</span><span class="p">(</span><span class="s1">'char'</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="s1">'&lt;UNK&gt;'</span><span class="p">)</span>
+<span class="n">vocab</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Length of vocabulary: '</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">int2char</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Int to Char: '</span><span class="p">,</span> <span class="n">vocab</span><span class="o">.</span><span class="n">int2char</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Char to Int: '</span><span class="p">,</span> <span class="n">vocab</span><span class="o">.</span><span class="n">char2int</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Length of vocabulary:  38
+Int to Char:  ['&lt;UNK&gt;', 'l', 'g', 'b', 'z', '-', 'k', 'e', 'o', 'r', 'i', ',', 'w', "'", ';', 'f', 'x', '?', 'd', '$', '3', 'a', 's', 'v', 'm', '&amp;', 't', 'h', 'u', 'p', 'n', 'y', ' ', 'c', 'q', '!', 'j', '.']
+Char to Int:  {'&lt;UNK&gt;': 0, 'l': 1, 'g': 2, 'b': 3, 'z': 4, '-': 5, 'k': 6, 'e': 7, 'o': 8, 'r': 9, 'i': 10, ',': 11, 'w': 12, "'": 13, ';': 14, 'f': 15, 'x': 16, '?': 17, 'd': 18, '$': 19, '3': 20, 'a': 21, 's': 22, 'v': 23, 'm': 24, '&amp;': 25, 't': 26, 'h': 27, 'u': 28, 'p': 29, 'n': 30, 'y': 31, ' ': 32, 'c': 33, 'q': 34, '!': 35, 'j': 36, '.': 37}
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Save-the-dictionary">
+<a class="anchor" href="#Save-the-dictionary" aria-hidden="true"><span class="octicon octicon-link"></span></a>Save the dictionary<a class="anchor-link" href="#Save-the-dictionary"> </a>
+</h3>
+<p>In this example it is nor mandatory to save the dictionary inmediately, because it is a quick task. But when dealing with a huge corpus and a large dictionary, we should save the dictionary to restore it latter when new experiments will be executed.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Check or create the directory where dictionary will be saved</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">DATA_PATH</span><span class="p">):</span> <span class="c1"># Make sure that the folder exists</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">DATA_PATH</span><span class="p">)</span>
+    
+<span class="c1"># Save the dictionary to data path dir  </span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_PATH</span><span class="p">,</span> <span class="s1">'char_dict.pkl'</span><span class="p">),</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">char2int</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_PATH</span><span class="p">,</span> <span class="s1">'int_dict.pkl'</span><span class="p">),</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">int2char</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Create-the-input-data-and-labels-for-training">
+<a class="anchor" href="#Create-the-input-data-and-labels-for-training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create the input data and labels for training<a class="anchor-link" href="#Create-the-input-data-and-labels-for-training"> </a>
+</h3>
+<p>As we're going to predict the next character in the sequence at each time step, we'll have to divide each sentence into</p>
+<ul>
+<li>
+<strong>Input data</strong>: The last input character should be excluded as it does not need to be fed into the model</li>
+<li>
+<strong>Target/Ground Truth Label</strong>: One time-step ahead of the Input data as this will be the "correct answer" for the model at each time step corresponding to the input data</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">one_hot_encode</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">dict_size</span><span class="p">):</span>
+    <span class="sd">''' Define one hot encode matrix for our sequences'''</span>
+    <span class="c1"># Creating a multi-dimensional array with the desired output shape</span>
+    <span class="c1"># Encode every integer with its one hot representation</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">dict_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)[</span><span class="n">indices</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]</span>
+    
+    <span class="c1"># Finally reshape it to get back to the original array</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">indices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dict_size</span><span class="p">))</span>
+            
+    <span class="k">return</span> <span class="n">features</span>
+
+<span class="k">def</span> <span class="nf">encode_text</span><span class="p">(</span><span class="n">input_text</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">one_hot</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">''' Encode the input_text replacing the char by its integer number based on the dictionary vocab'''</span>
+    <span class="c1"># Replace every char by its integer value based on the vocabulary</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">vocab</span><span class="o">.</span><span class="n">char2int</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">character</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">character</span> <span class="ow">in</span> <span class="n">input_text</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">one_hot</span><span class="p">:</span>
+    <span class="c1"># One hot encode every integer of the sequence</span>
+        <span class="n">dict_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">char2int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">one_hot_encode</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dict_size</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we can encode our text, replacing every character by the integer value in the dictionary. When we have our dataset unified and prepared, we should do a quick check and see an example of the data our model will be trained on. This is generally a good idea as it allows you to see how each of the further processing steps affects the reviews and it also ensures that the data has been loaded correctly.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Encode the train dataset</span>
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">encode_text</span><span class="p">(</span><span class="n">sentences</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">one_hot</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Create the input sequence, from 0 to len-1</span>
+<span class="n">input_seq</span><span class="o">=</span><span class="n">train_data</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="c1"># Create the target sequence, from 1 to len. It is right-shifted one place</span>
+<span class="n">target_seq</span><span class="o">=</span><span class="n">train_data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">Original text:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sentences</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">Encoded text:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">train_data</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">Input sequence:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">input_seq</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">Target sequence:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">target_seq</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+Original text:
+before we proceed any further, hear me speak. speak, speak. you are all resolved rather to die than 
+
+Encoded text:
+[ 3  7 15  8  9  7 32 12  7 32 29  9  8 33  7  7 18 32 21 30 31 32 15 28
+  9 26 27  7  9 11 32 27  7 21  9 32 24  7 32 22 29  7 21  6 37 32 22 29
+  7 21  6 11 32 22 29  7 21  6 37 32 31  8 28 32 21  9  7 32 21  1  1 32
+  9  7 22  8  1 23  7 18 32  9 21 26 27  7  9 32 26  8 32 18 10  7 32 26
+ 27 21 30 32]
+
+Input sequence:
+[ 3  7 15  8  9  7 32 12  7 32 29  9  8 33  7  7 18 32 21 30 31 32 15 28
+  9 26 27  7  9 11 32 27  7 21  9 32 24  7 32 22 29  7 21  6 37 32 22 29
+  7 21  6 11 32 22 29  7 21  6 37 32 31  8 28 32 21  9  7 32 21  1  1 32
+  9  7 22  8  1 23  7 18 32  9 21 26 27  7  9 32 26  8 32 18 10  7 32 26
+ 27 21 30 32]
+
+Target sequence:
+[ 7 15  8  9  7 32 12  7 32 29  9  8 33  7  7 18 32 21 30 31 32 15 28  9
+ 26 27  7  9 11 32 27  7 21  9 32 24  7 32 22 29  7 21  6 37 32 22 29  7
+ 21  6 11 32 22 29  7 21  6 37 32 31  8 28 32 21  9  7 32 21  1  1 32  9
+  7 22  8  1 23  7 18 32  9 21 26 27  7  9 32 26  8 32 18 10  7 32 26 27
+ 21 30 32 26]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we can save our encoded dataset to a file, so we can restore it whenever it is necessary. It is important to note the format of the data that we are saving as we will need to know it when we write the training code. In our case, we will save the dataset as a pickle object, it is the array containing the whole dataset encoded as an integer value for every character.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Save the encoded text to a file</span>
+<span class="n">encoded_data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_PATH</span><span class="p">,</span> <span class="s1">'input_data.pkl'</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">encoded_data</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Lets check our one-hot-encode function that we will use later during the training phase:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'Encoded characters: '</span><span class="p">,</span><span class="n">train_data</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">102</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'One-hot-encoded characters: '</span><span class="p">,</span><span class="n">one_hot_encode</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="mi">100</span><span class="p">:</span><span class="mi">102</span><span class="p">],</span> <span class="mi">28</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Encoded characters:  [26  8]
+One-hot-encoded characters:  [[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+  0. 0. 1. 0.]
+ [0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+  0. 0. 0. 0.]]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Create-a-batch-data-generator">
+<a class="anchor" href="#Create-a-batch-data-generator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create a batch data generator<a class="anchor-link" href="#Create-a-batch-data-generator"> </a>
+</h2>
+<p>When training on the dataset, we need to extract a batch size examples from the inputs and targets, forward and backward the RNN and then repite the iteration with another batch size examples. 
+A batch generator will help us to extract a batch size examples from our datasets.</p>
+<p>First we will load a small portion of the training data set to use as a sample. It would be very time consuming to try and train the model completely in the notebook as we do not have access to a gpu and the compute instance that we are using is not particularly powerful. However, we can work on a small bit of the data to get a feel for how our training script is behaving.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">batch_generator_sequence</span><span class="p">(</span><span class="n">features_seq</span><span class="p">,</span> <span class="n">label_seq</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">):</span>
+    <span class="sd">"""Generator function that yields batches of data (input and target)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        features_seq: sequence of chracters, feature of our model.</span>
+<span class="sd">        label_seq: sequence of chracters, the target label of our model</span>
+<span class="sd">        batch_size (int): number of examples (in this case, sentences) per batch.</span>
+<span class="sd">        seq_len (int): maximum length of the output tensor.</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        x_epoch: sequence of features for the epoch</span>
+<span class="sd">        y_epoch: sequence of labels for the epoch</span>
+<span class="sd">    """</span>
+    <span class="c1"># calculate the number of batches we can supply</span>
+    <span class="n">num_batches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">features_seq</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="n">batch_size</span> <span class="o">*</span> <span class="n">seq_len</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_batches</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No batches created. Use smaller batch size or sequence length."</span><span class="p">)</span>
+    <span class="c1"># calculate effective length of text to use</span>
+    <span class="n">rounded_len</span> <span class="o">=</span> <span class="n">num_batches</span> <span class="o">*</span> <span class="n">batch_size</span> <span class="o">*</span> <span class="n">seq_len</span>
+    <span class="c1"># Reshape the features matrix in batch size x num_batches * seq_len</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">features_seq</span><span class="p">[:</span> <span class="n">rounded_len</span><span class="p">],</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_batches</span> <span class="o">*</span> <span class="n">seq_len</span><span class="p">])</span>
+    
+    <span class="c1"># Reshape the target matrix in batch size x num_batches * seq_len</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">label_seq</span><span class="p">[:</span> <span class="n">rounded_len</span><span class="p">],</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_batches</span> <span class="o">*</span> <span class="n">seq_len</span><span class="p">])</span>
+    
+    <span class="n">epoch</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># roll so that no need to reset rnn states over epochs</span>
+        <span class="n">x_epoch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">epoch</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">y_epoch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">epoch</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">x_epoch</span><span class="p">[</span><span class="n">batch</span><span class="p">],</span> <span class="n">y_epoch</span><span class="p">[</span><span class="n">batch</span><span class="p">]</span>
+        <span class="n">epoch</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Define-the-RNN-model">
+<a class="anchor" href="#Define-the-RNN-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Define the RNN model<a class="anchor-link" href="#Define-the-RNN-model"> </a>
+</h2>
+<p>The model is very simple_</p>
+<ul>
+<li>An LSTM layer to encode the input (there is no need for an embedding layer because the data is one-hot-encoded)</li>
+<li>A dropout layer to reduce overfitting</li>
+<li>The decoder, a fully connected layer mapping to a vocabulary size outputs</li>
+</ul>
+<p>The output provides the probability of every item in the vocabulary to be the next char.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">RNNModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_size</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">n_layers</span><span class="p">,</span> <span class="n">drop_rate</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">(</span><span class="n">RNNModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Defining some parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">=</span> <span class="n">embedding_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span> <span class="o">=</span> <span class="n">n_layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vocab_size</span> <span class="o">=</span> <span class="n">vocab_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_rate</span> <span class="o">=</span> <span class="n">drop_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">char2int</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">int2char</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+        <span class="c1">#Defining the layers</span>
+        <span class="c1"># Define the encoder as an Embedding layer</span>
+        <span class="c1">#self.encoder = nn.Embedding(vocab_size, embedding_size)</span>
+            
+        <span class="c1"># Dropout layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">drop_rate</span><span class="p">)</span>
+        <span class="c1"># RNN Layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="n">embedding_size</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">n_layers</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">drop_rate</span><span class="p">,</span> <span class="n">batch_first</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Fully connected layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        
+        <span class="c1"># input shape: [batch_size, seq_len, embedding_size]</span>
+        <span class="c1"># Apply the embedding layer and dropout</span>
+        <span class="c1">#embed_seq = self.dropout(self.encoder(x))</span>
+            
+        <span class="c1">#print('Input RNN shape: ', embed_seq.shape)</span>
+        <span class="c1"># shape: [batch_size, seq_len, embedding_size]</span>
+        <span class="n">rnn_out</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rnn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="c1">#print('Out RNN shape: ', rnn_out.shape)</span>
+        <span class="c1"># rnn_out shape: [batch_size, seq_len, rnn_size]</span>
+        <span class="c1"># hidden shape: [2, num_layers, batch_size, rnn_size]</span>
+        <span class="n">rnn_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">rnn_out</span><span class="p">)</span>
+
+        <span class="c1"># shape: [seq_len, batch_size, rnn_size]</span>
+        <span class="c1"># Stack up LSTM outputs using view</span>
+        <span class="c1"># you may need to use contiguous to reshape the output</span>
+        <span class="n">rnn_out</span> <span class="o">=</span> <span class="n">rnn_out</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">)</span>
+
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">rnn_out</span><span class="p">)</span>
+        <span class="c1"># output shape: [seq_len * batch_size, vocab_size]</span>
+        <span class="c1">#print('Output model shape: ', logits.shape)</span>
+        <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">state</span>
+    
+    <span class="k">def</span> <span class="nf">init_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        initialises rnn states.</span>
+<span class="sd">        """</span>
+        <span class="c1">#return (Variable(torch.zeros(self.n_layers, batch_size, self.hidden_dim)),</span>
+        <span class="c1">#        Variable(torch.zeros(self.n_layers, batch_size, self.hidden_dim)))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c1"># input shape: [seq_len, batch_size]</span>
+        <span class="n">logits</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="c1"># logits shape: [seq_len * batch_size, vocab_size]</span>
+        <span class="c1"># hidden shape: [2, num_layers, batch_size, rnn_size]</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="c1"># shape: [seq_len * batch_size, vocab_size]</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="nb">input</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">probs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="c1"># output shape: [seq_len, batch_size, vocab_size]</span>
+        <span class="k">return</span> <span class="n">probs</span><span class="p">,</span> <span class="n">hidden</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Training-the-model">
+<a class="anchor" href="#Training-the-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Training the model<a class="anchor-link" href="#Training-the-model"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>After defining a RNN model, we can code the main training function. It is very simple and the steps involved are the usual ones in any other training of a neural network: in every epoch get the next batch data, move the tensors to the device, call the model (Forward pass), calculate the loss function, get the gradients and update the weights.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">train_main</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">val_batches</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">n_epochs</span><span class="p">,</span> <span class="n">clip_norm</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="c1"># Training Run</span>
+    
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># Store the loss in every batch iteration</span>
+        <span class="c1">#epoch_losses = torch.Tensor(num_batches)</span>
+        <span class="n">epoch_losses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Init the hidden state</span>
+        <span class="n">hidden</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">init_state</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+        <span class="c1"># Train all the batches in every epoch</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_batches</span><span class="o">-</span><span class="n">val_batches</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">"Epoch </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="c1">#print('Batch :', i)</span>
+            <span class="c1"># Get the next batch data for input and target</span>
+            <span class="n">input_batch</span><span class="p">,</span> <span class="n">target_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">batch_data</span><span class="p">)</span>
+            <span class="c1"># Onr hot encode the input data</span>
+            <span class="n">input_batch</span> <span class="o">=</span> <span class="n">one_hot_encode</span><span class="p">(</span><span class="n">input_batch</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span>
+            <span class="c1"># Tranform to tensor</span>
+            <span class="n">input_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">input_batch</span><span class="p">)</span>
+            <span class="n">target_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">target_batch</span><span class="p">)</span>
+            <span class="c1"># Create a new variable for the hidden state, necessary to calculate the gradients</span>
+            <span class="n">hidden</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(([</span><span class="n">Variable</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">hidden</span><span class="p">]))</span>
+            <span class="c1"># Move the input data to the device</span>
+            <span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="c1">#print('Input shape: ', input_data.shape)</span>
+            <span class="c1">#print('Hidden shape: ', hidden[0].shape, hidden[1].shape)</span>
+            <span class="c1"># Set the model to train and prepare the gradients</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span> <span class="c1"># Clears existing gradients from previous epoch</span>
+            <span class="c1"># Pass Fordward the RNN</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+            <span class="c1">#print('Output shape: ', output.shape)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="c1">#print('Output shape: ', output.shape)</span>
+            <span class="c1">#print('Target shape; ', target_data.shape)</span>
+            <span class="c1"># Move the target data to the device</span>
+            <span class="n">target_data</span> <span class="o">=</span> <span class="n">target_data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="c1">#print('Target shape; ', target_data.shape)</span>
+            <span class="n">target_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">target_data</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="o">*</span><span class="n">seq_len</span><span class="p">,))</span>
+            <span class="c1">#print('Target shape; ', target_data.shape)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_data</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="o">*</span><span class="n">seq_len</span><span class="p">))</span>
+            <span class="c1">#print(loss)</span>
+            <span class="c1"># Save the loss</span>
+            <span class="c1">#epoch_losses[i] = loss.item() #data[0]</span>
+            <span class="n">epoch_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="c1">#data[0]</span>
+        
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span> <span class="c1"># Does backpropagation and calculates gradients</span>
+            <span class="c1"># clip gradient norm</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">clip_norm</span><span class="p">)</span>
+            
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span> <span class="c1"># Updates the weights accordingly</span>
+    
+        <span class="c1"># Now, when epoch is finished, evaluate the model on validation data</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">val_hidden</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">init_state</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+        <span class="n">val_losses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">val_batches</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">"Val Epoch </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="c1"># Get the next batch data for input and target</span>
+            <span class="n">input_batch</span><span class="p">,</span> <span class="n">target_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">batch_data</span><span class="p">)</span>
+            <span class="c1"># Onr hot encode the input data</span>
+            <span class="n">input_batch</span> <span class="o">=</span> <span class="n">one_hot_encode</span><span class="p">(</span><span class="n">input_batch</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span>
+            <span class="c1"># Tranform to tensor</span>
+            <span class="n">input_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">input_batch</span><span class="p">)</span>
+            <span class="n">target_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">target_batch</span><span class="p">)</span>
+            <span class="c1"># Create a new variable for the hidden state, necessary to calculate the gradients</span>
+            <span class="n">hidden</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(([</span><span class="n">Variable</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">val_hidden</span><span class="p">]))</span>
+            <span class="c1"># Move the input data to the device</span>
+            <span class="n">input_data</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="c1"># Pass Fordward the RNN</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+            <span class="c1">#print('Output shape: ', output.shape)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="c1">#print('Output shape: ', output.shape)</span>
+            <span class="c1">#print('Target shape; ', target_data.shape)</span>
+            <span class="c1"># Move the target data to the device</span>
+            <span class="n">target_data</span> <span class="o">=</span> <span class="n">target_data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="c1">#print('Target shape; ', target_data.shape)</span>
+            <span class="n">target_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">target_data</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="o">*</span><span class="n">seq_len</span><span class="p">,))</span>
+            <span class="c1">#print('Target shape; ', target_data.shape)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_data</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">batch_size</span><span class="o">*</span><span class="n">seq_len</span><span class="p">))</span>
+            <span class="c1">#print(loss)</span>
+            <span class="c1"># Save the loss</span>
+            <span class="n">val_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="c1">#data[0]</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>                  
+        <span class="c1">#if epoch%2 == 0:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Epoch: </span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">.............'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">n_epochs</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">' '</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Train Loss: </span><span class="si">{:.4f}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">epoch_losses</span><span class="p">)),</span> <span class="n">end</span><span class="o">=</span><span class="s1">' '</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Val Loss: </span><span class="si">{:.4f}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">val_losses</span><span class="p">)))</span>
+        
+    <span class="k">return</span> <span class="n">epoch_losses</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Before we start building the model, let's use a build in feature in PyTorch to check the device we're running on (CPU or GPU). This implementation will not require GPU as the training is really simple. However, as you progress on to large datasets and models with millions of trainable parameters, using the GPU will be very important to speed up your training.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">set_device</span><span class="p">():</span>
+    <span class="c1"># torch.cuda.is_available() checks and returns a Boolean True if a GPU is available, else it'll return False</span>
+    <span class="n">is_cuda</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+
+    <span class="c1"># If we have a GPU available, we'll set our device to GPU. We'll use this device variable later in our code.</span>
+    <span class="k">if</span> <span class="n">is_cuda</span><span class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">"cuda"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"GPU is available"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">"cpu"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"GPU not available, CPU used"</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">device</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>After defining the model above, we'll have to instantiate the model with the relevant parameters and define our hyperparamters as well. The hyperparameters we're defining below are:</p>
+<ul>
+<li>n_epochs: Number of Epochs --&gt; This refers to the number of times our model will go through the entire training dataset</li>
+<li>lr: Learning Rate --&gt; This affects the rate at which our model updates the weights in the cells each time backpropogation is done<ul>
+<li>A smaller learning rate means that the model changes the values of the weight with a smaller magnitude</li>
+<li>A larger learning rate means that the weights are updated to a larger extent for each time step</li>
+</ul>
+</li>
+<li>batch_size: Number of examples to train on every train step</li>
+<li>maxlen: Length of the input sequence of char</li>
+<li>embedding_size: the vocab size because the input feature is one-hot-encoded</li>
+<li>hidden_dim: the number of hidden units in our LSTM module</li>
+<li>n_layers: number of layers of our LSTM module</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define hyperparameters for training</span>
+<span class="n">n_epochs</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span>
+<span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span>
+<span class="n">maxlen</span><span class="o">=</span><span class="mi">64</span>
+<span class="n">clip_norm</span><span class="o">=</span><span class="mi">5</span>
+<span class="n">val_fraction</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<span class="c1"># Define hypeparameters of the model</span>
+<span class="n">hidden_dim</span> <span class="o">=</span> <span class="mi">64</span> <span class="c1">#64</span>
+<span class="n">n_layers</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">embedding_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">char2int</span><span class="p">)</span>
+<span class="n">dict_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">char2int</span><span class="p">)</span>
+<span class="n">drop_rate</span> <span class="o">=</span> <span class="mf">0.2</span>
+
+<span class="c1"># Set the device for training</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">set_device</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Device: '</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="c1"># Set a seed to reproduce experiments</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>GPU not available, CPU used
+Device:  cpu
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;torch._C.Generator at 0x7f5761eba3b0&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Similar to other neural networks, we have to define the optimizer and loss function as well. We’ll be using CrossEntropyLoss as the final output is basically a classification task.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Instantiate the model with hyperparameters</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">RNNModel</span><span class="p">(</span><span class="n">dict_size</span><span class="p">,</span><span class="n">embedding_size</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">n_layers</span><span class="p">)</span>
+<span class="c1"># We'll also set the model to the device that we defined earlier (default is CPU)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="c1"># Define Loss, Optimizer</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>RNNModel(
+  (dropout): Dropout(p=0.2, inplace=False)
+  (rnn): LSTM(38, 64, batch_first=True, dropout=0.2)
+  (decoder): Linear(in_features=64, out_features=38, bias=True)
+)
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/home/ec2-user/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/torch/nn/modules/rnn.py:50: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.2 and num_layers=1
+  "num_layers={}".format(dropout, num_layers))
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Limit the size of our input sequence to limit the training time, we are just testing the model</span>
+<span class="n">input_seq</span> <span class="o">=</span> <span class="n">input_seq</span><span class="p">[:</span><span class="mi">100000</span><span class="p">]</span>
+<span class="n">target_seq</span> <span class="o">=</span> <span class="n">target_seq</span><span class="p">[:</span><span class="mi">100000</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_seq</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>100000
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Calculate the number of batches to train</span>
+<span class="n">num_batches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_seq</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="n">batch_size</span><span class="o">*</span><span class="n">maxlen</span><span class="p">)</span>
+<span class="n">val_batches</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_batches</span><span class="o">*</span><span class="n">val_fraction</span><span class="p">)</span>
+<span class="c1"># Create the batch data generator</span>
+<span class="n">batch_data</span> <span class="o">=</span> <span class="n">batch_generator_sequence</span><span class="p">(</span><span class="n">input_seq</span><span class="p">,</span> <span class="n">target_seq</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">maxlen</span><span class="p">)</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="n">train_main</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">,</span> <span class="n">val_batches</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> 
+                    <span class="n">maxlen</span><span class="p">,</span> <span class="n">n_epochs</span><span class="p">,</span> <span class="n">clip_norm</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Epoch 1/6: 100%|██████████| 22/22 [00:02&lt;00:00,  8.41it/s]
+Val Epoch 1/6: 100%|██████████| 2/2 [00:00&lt;00:00, 61.46it/s]
+Epoch 2/6:  14%|█▎        | 3/22 [00:00&lt;00:00, 24.20it/s]</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch: 1/5............. Train Loss: 3.0507 Val Loss: 2.8581
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Epoch 2/6: 100%|██████████| 22/22 [00:00&lt;00:00, 24.67it/s]
+Val Epoch 2/6: 100%|██████████| 2/2 [00:00&lt;00:00, 61.66it/s]
+Epoch 3/6:  14%|█▎        | 3/22 [00:00&lt;00:00, 24.21it/s]</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch: 2/5............. Train Loss: 2.6476 Val Loss: 2.4374
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Epoch 3/6: 100%|██████████| 22/22 [00:00&lt;00:00, 24.60it/s]
+Val Epoch 3/6: 100%|██████████| 2/2 [00:00&lt;00:00, 62.49it/s]
+Epoch 4/6:  14%|█▎        | 3/22 [00:00&lt;00:00, 24.54it/s]</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch: 3/5............. Train Loss: 2.3630 Val Loss: 2.2691
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Epoch 4/6: 100%|██████████| 22/22 [00:00&lt;00:00, 24.14it/s]
+Val Epoch 4/6: 100%|██████████| 2/2 [00:00&lt;00:00, 56.03it/s]
+Epoch 5/6:  14%|█▎        | 3/22 [00:00&lt;00:00, 23.93it/s]</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch: 4/5............. Train Loss: 2.2456 Val Loss: 2.1838
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Epoch 5/6: 100%|██████████| 22/22 [00:00&lt;00:00, 24.33it/s]
+Val Epoch 5/6: 100%|██████████| 2/2 [00:00&lt;00:00, 61.45it/s]</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch: 5/5............. Train Loss: 2.1780 Val Loss: 2.1277
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Once the model is trained, we save it to disk then we can reload later and use ir for prediction. We also save the model parameters, they will be used to recreate the model if it is necessary.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Save the parameters used to construct the model</span>
+<span class="n">model_info_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s1">'model_info.pth'</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_info_path</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'n_layers'</span><span class="p">:</span> <span class="n">n_layers</span><span class="p">,</span>
+        <span class="s1">'embedding_dim'</span><span class="p">:</span> <span class="n">embedding_size</span><span class="p">,</span>
+        <span class="s1">'hidden_dim'</span><span class="p">:</span> <span class="n">hidden_dim</span><span class="p">,</span>
+        <span class="s1">'vocab_size'</span><span class="p">:</span> <span class="n">dict_size</span><span class="p">,</span>
+        <span class="s1">'drop_rate'</span><span class="p">:</span> <span class="n">drop_rate</span>
+    <span class="p">}</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model_info</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Save the model parameters</span>
+<span class="n">model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="s1">'model.pth'</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">f</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Predict-an-input-sequence">
+<a class="anchor" href="#Predict-an-input-sequence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Predict an input sequence<a class="anchor-link" href="#Predict-an-input-sequence"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">sample_from_probs</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    truncated weighted random choice.</span>
+<span class="sd">    """</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
+    <span class="c1"># set probabilities after top_n to 0</span>
+    <span class="n">probs</span><span class="p">[</span><span class="n">indices</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="o">-</span><span class="n">top_n</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">#print(probs.shape)</span>
+    <span class="n">sampled_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sampled_index</span>
+
+<span class="k">def</span> <span class="nf">predict_probs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">character</span><span class="p">,</span> <span class="n">vocab</span><span class="p">):</span>
+    <span class="c1"># One-hot encoding our input to fit into the model</span>
+    <span class="n">character</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">vocab</span><span class="o">.</span><span class="n">char2int</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">character</span><span class="p">]])</span>
+    <span class="c1">#character = one_hot_encode(character, len(vocab.char2int), character.shape[1], 1)</span>
+    <span class="n">character</span> <span class="o">=</span> <span class="n">one_hot_encode</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span>
+    <span class="n">character</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">character</span><span class="p">)</span>
+    <span class="n">character</span> <span class="o">=</span> <span class="n">character</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    
+    <span class="n">out</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="k">return</span> <span class="n">prob</span><span class="p">,</span> <span class="n">hidden</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let’s test our model now and see what kind of output we will get.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_from_text</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">out_len</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'hey'</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># eval mode</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">start</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="c1"># First off, run through the starting characters</span>
+    <span class="n">chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">start</span><span class="p">]</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">out_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>
+    <span class="c1"># Generate the initial hidden state</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">set_device</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">init_state</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1"># Warm up the initial state, predicting on the initial string</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">chars</span><span class="p">:</span>
+        <span class="c1">#char, state = predict(model, ch, state, top_n=top_k)</span>
+        <span class="n">probs</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">predict_probs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+        <span class="n">next_index</span> <span class="o">=</span> <span class="n">sample_from_probs</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">top_n</span><span class="p">)</span>
+
+    <span class="c1"># Now pass in the previous characters and get a new one</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="c1">#char, h = predict_char(model, chars, vocab)</span>
+        <span class="n">probs</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">predict_probs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">chars</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+        <span class="n">next_index</span> <span class="o">=</span> <span class="n">sample_from_probs</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">top_n</span><span class="p">)</span>
+        <span class="c1"># append to sequence</span>
+        <span class="n">chars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">int2char</span><span class="p">[</span><span class="n">next_index</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">text_predicted</span> <span class="o">=</span> <span class="n">generate_from_text</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">'we want '</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">text_predicted</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text_predicted</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>GPU not available, CPU used
+we want the he ares. ar to hat
+30
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The next function  will feed our model one character at a time instead of providing it with the entire string of text.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_from_char</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">out_len</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">'hey'</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># eval mode</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">start</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="c1"># First off, run through the starting characters</span>
+    <span class="n">chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">start</span><span class="p">]</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">out_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>
+    <span class="c1"># Generate the initial hidden state</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">set_device</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">init_state</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Warm up the initial state, predicting on the initial string</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">chars</span><span class="p">:</span>
+        <span class="c1">#char, state = predict(model, ch, state, top_n=top_k)</span>
+        <span class="n">probs</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">predict_probs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+        <span class="n">next_index</span> <span class="o">=</span> <span class="n">sample_from_probs</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">top_n</span><span class="p">)</span>
+        
+    <span class="c1"># Include the last char predicted to the predicted output</span>
+    <span class="n">chars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">int2char</span><span class="p">[</span><span class="n">next_index</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>   
+    
+    <span class="c1"># Now pass in the previous characters and get a new one</span>
+    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1">#char, h = predict_char(model, chars, vocab)</span>
+        <span class="n">probs</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">predict_probs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">chars</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">vocab</span><span class="p">)</span>
+        <span class="n">next_index</span> <span class="o">=</span> <span class="n">sample_from_probs</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">top_n</span><span class="p">)</span>
+        <span class="c1"># append to sequence</span>
+        <span class="n">chars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vocab</span><span class="o">.</span><span class="n">int2char</span><span class="p">[</span><span class="n">next_index</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">text_predicted</span> <span class="o">=</span> <span class="n">generate_from_char</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">vocab</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">'we want '</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">text_predicted</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text_predicted</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>GPU not available, CPU used
+we want what, and and whin she
+30
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We also have developed a function to predict the next char given a initial string:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">predict_char</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">character</span><span class="p">,</span> <span class="n">vocab</span><span class="p">):</span>
+    <span class="c1"># One-hot encoding our input to fit into the model</span>
+    <span class="n">character</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">vocab</span><span class="o">.</span><span class="n">char2int</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">character</span><span class="p">]])</span>
+    <span class="c1">#character = one_hot_encode(character, len(vocab.char2int), character.shape[1], 1)</span>
+    <span class="n">character</span> <span class="o">=</span> <span class="n">one_hot_encode</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">)</span>
+    <span class="n">character</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">character</span><span class="p">)</span>
+    <span class="c1"># Generate set the device</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">set_device</span><span class="p">()</span>
+    <span class="n">character</span> <span class="o">=</span> <span class="n">character</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># eval mode</span>
+    <span class="c1"># Generate the initial hidden state</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">init_state</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">out</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+    <span class="c1"># Taking the class with the highest probability score from the output</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">char_ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">vocab</span><span class="o">.</span><span class="n">int2char</span><span class="p">[</span><span class="n">char_ind</span><span class="p">],</span> <span class="n">hidden</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">predict_char</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">'we want '</span><span class="p">,</span> <span class="n">vocab</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Initial string: '</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>GPU not available, CPU used
+Initial string:  t
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>At this point we are ready to train our model in Amazon SageMaker using the whole data set and improving its performance training on many epochs for a longer time.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><a class="u-url" href="/BlogEms/fastpages/jupyter/rnn/lstm/pytorch/2020/09/03/char-level-text-generator-pytorch.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/BlogEms/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/BlogEms/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/BlogEms/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/edumunozsala" title="edumunozsala"><svg class="svg-icon grey"><use xlink:href="/BlogEms/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/emunozsala" title="emunozsala"><svg class="svg-icon grey"><use xlink:href="/BlogEms/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
