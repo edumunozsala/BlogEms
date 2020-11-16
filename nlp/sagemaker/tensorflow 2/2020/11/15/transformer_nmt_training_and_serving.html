@@ -1,0 +1,2954 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Steps to start training your custom Tensorflow model in AWS SageMaker | fastpages</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Steps to start training your custom Tensorflow model in AWS SageMaker" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Describe the most relevant steps to start training a custom algorithm in AWS SageMaker, showing how to deal with experiments and solving some of the problems when facing with custom models and SageMaker script mode on" />
+<meta property="og:description" content="Describe the most relevant steps to start training a custom algorithm in AWS SageMaker, showing how to deal with experiments and solving some of the problems when facing with custom models and SageMaker script mode on" />
+<link rel="canonical" href="https://edumunozsala.github.io/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html" />
+<meta property="og:url" content="https://edumunozsala.github.io/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-11-15T00:00:00-06:00" />
+<script type="application/ld+json">
+{"headline":"Steps to start training your custom Tensorflow model in AWS SageMaker","description":"Describe the most relevant steps to start training a custom algorithm in AWS SageMaker, showing how to deal with experiments and solving some of the problems when facing with custom models and SageMaker script mode on","datePublished":"2020-11-15T00:00:00-06:00","dateModified":"2020-11-15T00:00:00-06:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://edumunozsala.github.io/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html"},"url":"https://edumunozsala.github.io/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/BlogEms/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://edumunozsala.github.io/BlogEms/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/BlogEms/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Steps to start training your custom Tensorflow model in AWS SageMaker | fastpages</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Steps to start training your custom Tensorflow model in AWS SageMaker" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Describe the most relevant steps to start training a custom algorithm in AWS SageMaker, showing how to deal with experiments and solving some of the problems when facing with custom models and SageMaker script mode on" />
+<meta property="og:description" content="Describe the most relevant steps to start training a custom algorithm in AWS SageMaker, showing how to deal with experiments and solving some of the problems when facing with custom models and SageMaker script mode on" />
+<link rel="canonical" href="https://edumunozsala.github.io/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html" />
+<meta property="og:url" content="https://edumunozsala.github.io/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-11-15T00:00:00-06:00" />
+<script type="application/ld+json">
+{"headline":"Steps to start training your custom Tensorflow model in AWS SageMaker","description":"Describe the most relevant steps to start training a custom algorithm in AWS SageMaker, showing how to deal with experiments and solving some of the problems when facing with custom models and SageMaker script mode on","datePublished":"2020-11-15T00:00:00-06:00","dateModified":"2020-11-15T00:00:00-06:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://edumunozsala.github.io/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html"},"url":"https://edumunozsala.github.io/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://edumunozsala.github.io/BlogEms/feed.xml" title="fastpages" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/BlogEms/">fastpages</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/BlogEms/about/">About Me</a><a class="page-link" href="/BlogEms/search/">Search</a><a class="page-link" href="/BlogEms/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Steps to start training your custom Tensorflow model in AWS SageMaker</h1><p class="page-description">Describe the most relevant steps to start training a custom algorithm in AWS SageMaker, showing how to deal with experiments and solving some of the problems when facing with custom models and SageMaker script mode on</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-11-15T00:00:00-06:00" itemprop="datePublished">
+        Nov 15, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      46 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#NLP">NLP</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#SageMaker">SageMaker</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/BlogEms/categories/#Tensorflow 2">Tensorflow 2</a>
+        
+      
+      </p>
+    
+
+    
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#SageMaker-Experiments,-TensorFlow-script-mode-training-and-restore-checkpoint-to-resume-training">SageMaker Experiments, TensorFlow script mode training and restore checkpoint to resume training </a></li>
+<li class="toc-entry toc-h1"><a href="#Amazon-SageMaker-Overview">Amazon SageMaker Overview </a></li>
+<li class="toc-entry toc-h1"><a href="#Problem-description">Problem description </a></li>
+<li class="toc-entry toc-h1"><a href="#Data-description">Data description </a></li>
+<li class="toc-entry toc-h1"><a href="#Set-up-the-environment">Set up the environment </a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#Define-global-variables-and-parameters">Define global variables and parameters </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#Create-an-experiment-and-trial">Create an experiment and trial </a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#Trackers">Trackers </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#Construct-a-script-for-training">Construct a script for training </a></li>
+<li class="toc-entry toc-h1"><a href="#Create-a-training-job-using-the-TensorFlow-estimator">Create a training job using the TensorFlow estimator </a></li>
+<li class="toc-entry toc-h1"><a href="#Start-the-training-job:-fit">Start the training job: fit </a></li>
+<li class="toc-entry toc-h1"><a href="#Show-metrics-from-SageMaker-Console">Show metrics from SageMaker Console </a></li>
+<li class="toc-entry toc-h1"><a href="#Restore-a-training-job-and-download-the-trained-model">Restore a training job and download the trained model </a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#Attach-a-previous-training-job">Attach a previous training job </a></li>
+<li class="toc-entry toc-h2"><a href="#Download-the-trained-model">Download the trained model </a>
+<ul>
+<li class="toc-entry toc-h3"><a href="#Import-the-tensorflow-model-and-load-the-model">Import the tensorflow model and load the model </a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#Make-some-predictions">Make some predictions </a></li>
+<li class="toc-entry toc-h1"><a href="#Resume-training-from-a-checkpoint">Resume training from a checkpoint </a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#Delete-the-experiment">Delete the experiment </a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#References">References </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2020-11-15-transformer_nmt_training_and_serving.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="SageMaker-Experiments,-TensorFlow-script-mode-training-and-restore-checkpoint-to-resume-training">
+<a class="anchor" href="#SageMaker-Experiments,-TensorFlow-script-mode-training-and-restore-checkpoint-to-resume-training" aria-hidden="true"><span class="octicon octicon-link"></span></a>SageMaker Experiments, TensorFlow script mode training and restore checkpoint to resume training<a class="anchor-link" href="#SageMaker-Experiments,-TensorFlow-script-mode-training-and-restore-checkpoint-to-resume-training"> </a>
+</h1>
+<p>Some sections of this notebook has been inspired by the tutorial:</p>
+<p><strong>Sagemaker Python SDK Examples: tensorflow_script_mode_training_and_serving.ipynb</strong></p>
+<p><a href="https://github.com/awslabs/amazon-sagemaker-examples/blob/master/sagemaker-python-sdk/tensorflow_script_mode_training_and_serving/tensorflow_script_mode_training_and_serving.ipynb">https://github.com/awslabs/amazon-sagemaker-examples/blob/master/sagemaker-python-sdk/tensorflow_script_mode_training_and_serving/tensorflow_script_mode_training_and_serving.ipynb</a></p>
+<p>In this notebook we will describe the most relevant steps to start training a custom algorithm in AWS SageMaker, not using a custom container, showing how to deal with experiments and solving some of the problems when facing with custom models when using SageMaker script mode on. Some basics concepts on SageMaker will not be detailed in order to focus on the relevant concepts.</p>
+<p>Following steps will be explained:</p>
+<ol>
+<li>
+<p>Create an Experiment and Trial to keep track of our experiments</p>
+</li>
+<li>
+<p>Load the training data to our training instance</p>
+</li>
+<li>
+<p>Create the scripts to train our custom model, a Transformer.</p>
+</li>
+<li>
+<p>Create an Estimator to train our model in a Tensorflow 2.1 container in script mode</p>
+</li>
+<li>
+<p>Create metric definitions to keep track of them in SageMaker</p>
+</li>
+<li>
+<p>Download the trained model to make predictions</p>
+</li>
+<li>
+<p>Resume training using the latest checkpoint from a previous training</p>
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Amazon-SageMaker-Overview">
+<a class="anchor" href="#Amazon-SageMaker-Overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Amazon SageMaker Overview<a class="anchor-link" href="#Amazon-SageMaker-Overview"> </a>
+</h1>
+<p><em>Amazon SageMaker is a fully managed machine learning service. With SageMaker, data scientists and developers can quickly and easily build and train machine learning models, and then directly deploy them into a production-ready hosted environment.</em></p>
+<p><em>Amazon SageMaker Developer Guide</em></p>
+<p>Amazon SageMaker provides many tools to help developers to manage the Machine Learning Lifecycle workflow:</p>
+<ul>
+<li>Fetch, Clean and transform the data: you can use SageMaker notebook instances to manipulate and analyze your data, then you can clean and transform it to the requiered format for your algorithm. And you can use Pipelines functionality to serve the data to your model during training.</li>
+<li>Train and evaluate the model: There are many different posibilities to train your model. You can use built-in algorithm, models provided by SageMaker, or you can use custom code to train in the most popular deep learning framewors (Tensorflow, Pytorch, Apache MXNet,..) or even use Apache Spark. Finally, you can use your own custom algorithm and build a Docker container then training the model on SageMaker. You can keep track of your model metrics to evaluate the performance.</li>
+<li>Deploy your model: Once your model is trained, you can deploy it in and endpoint service in SageMaker and make prediction one at a time or in batch mode.</li>
+</ul>
+<p><img src="/BlogEms/images/copied_from_nb/images/ml-concepts-10.png" alt="Alt" title="Machine Learning Lifecycle work flow"></p>
+<p>A simple and popular way to get started and work with SageMaker is to use the Amazon SageMaker Python SDK. It provides  Python APIs and containers that make it easy to train and deploy models in SageMaker, as well as examples for use with several different machine learning and deep learning frameworks.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Problem-description">
+<a class="anchor" href="#Problem-description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problem description<a class="anchor-link" href="#Problem-description"> </a>
+</h1>
+<p>For this project we will develope notebooks and scripts to train a Transformer Tensorflow 2 model to solve a neural machine translation problem, traslating simple sentences from English to Spanish. This problem and the model is extensively described in my Mdeium post <a href="https://towardsdatascience.com/attention-is-all-you-need-discovering-the-transformer-paper-73e5ff5e0634">"Attention is all you need: Discovering the Transformer paper"</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Data-description">
+<a class="anchor" href="#Data-description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Data description<a class="anchor-link" href="#Data-description"> </a>
+</h1>
+<p>For this exercise, we’ll use pairs of simple sentences. The source text will be in English, and the target text will be in Spanish, from the Tatoeba project where people contribute, adding translations every day. This is the <a href="http://www.manythings.org/anki/">link</a> to some translations in different languages. There you can download the Spanish/English <code>spa_eng.zip</code> file; it contains 124,457 pairs of sentences.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Set-up-the-environment">
+<a class="anchor" href="#Set-up-the-environment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Set up the environment<a class="anchor-link" href="#Set-up-the-environment"> </a>
+</h1>
+<p>Let's start by setting up the environment:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>First, we will import and load the libraries to use in our project.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sagemaker</span>
+<span class="kn">from</span> <span class="nn">sagemaker</span> <span class="kn">import</span> <span class="n">get_execution_role</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="c1"># Create a SageMaker session to work with</span>
+<span class="n">sagemaker_session</span> <span class="o">=</span> <span class="n">sagemaker</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="c1"># Get the role of our user and the region</span>
+<span class="n">role</span> <span class="o">=</span> <span class="n">get_execution_role</span><span class="p">()</span>
+<span class="n">region</span> <span class="o">=</span> <span class="n">sagemaker_session</span><span class="o">.</span><span class="n">boto_session</span><span class="o">.</span><span class="n">region_name</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>arn:aws:iam::223817798831:role/service-role/AmazonSageMaker-ExecutionRole-20200708T194212
+us-east-1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Define-global-variables-and-parameters">
+<a class="anchor" href="#Define-global-variables-and-parameters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Define global variables and parameters<a class="anchor-link" href="#Define-global-variables-and-parameters"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the variables for data locations</span>
+<span class="n">data_folder_name</span><span class="o">=</span><span class="s1">'data'</span>
+<span class="n">train_filename</span> <span class="o">=</span> <span class="s1">'spa.txt'</span>
+<span class="n">non_breaking_en</span> <span class="o">=</span> <span class="s1">'nonbreaking_prefix.en'</span>
+<span class="n">non_breaking_es</span> <span class="o">=</span> <span class="s1">'nonbreaking_prefix.es'</span>
+<span class="c1"># Set the directories for our nodel output</span>
+<span class="n">trainedmodel_path</span> <span class="o">=</span> <span class="s1">'trained_model'</span>
+<span class="n">output_data_path</span> <span class="o">=</span> <span class="s1">'output_data'</span>
+<span class="c1"># Set the name of the artifacts that our model generate (model not included) </span>
+<span class="n">model_info_file</span> <span class="o">=</span> <span class="s1">'model_info.pth'</span>
+<span class="n">input_vocab_file</span> <span class="o">=</span> <span class="s1">'in_vocab.pkl'</span>
+<span class="n">output_vocab_file</span> <span class="o">=</span> <span class="s1">'out_vocab.pkl'</span>
+<span class="c1"># Set the absolute path of the train data </span>
+<span class="n">train_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_folder_name</span><span class="p">,</span> <span class="n">train_filename</span><span class="p">))</span>
+<span class="n">non_breaking_en_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_folder_name</span><span class="p">,</span> <span class="n">non_breaking_en</span><span class="p">))</span>
+<span class="n">non_breaking_es_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_folder_name</span><span class="p">,</span> <span class="n">non_breaking_es</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When working with Amazon SageMaker training jobs that will run on containers in a new instance or "vm", the data has to be share using a S3 Storage folder. For this purpose we define the bucket name and the folder names where our inputs and outputs will be stored. In our case we define:</p>
+<ul>
+<li>The <strong>training data</strong> URI: where our input data is located</li>
+<li>The <strong>output folder</strong>: where our training saves the outputs fron our model</li>
+<li>The <strong>checkpoint folder</strong>: where our model uploads the checkpoints</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Specify your bucket name</span>
+<span class="n">bucket_name</span> <span class="o">=</span> <span class="s1">'edumunozsala-ml-sagemaker'</span>
+<span class="c1"># Set the training data folder in S3</span>
+<span class="n">training_folder</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'transformer-nmt/train'</span>
+<span class="c1"># Set the output folder in S3</span>
+<span class="n">output_folder</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'transformer-nmt'</span>
+<span class="c1"># Set the checkpoint in S3 folder for our model </span>
+<span class="n">ckpt_folder</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'transformer-nmt/ckpt'</span>
+
+<span class="n">training_data_uri</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'s3://'</span> <span class="o">+</span> <span class="n">bucket_name</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">'/'</span> <span class="o">+</span> <span class="n">training_folder</span>
+<span class="n">output_data_uri</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'s3://'</span> <span class="o">+</span> <span class="n">bucket_name</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">'/'</span> <span class="o">+</span> <span class="n">output_folder</span>
+<span class="n">ckpt_data_uri</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'s3://'</span> <span class="o">+</span> <span class="n">bucket_name</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">'/'</span> <span class="o">+</span> <span class="n">ckpt_folder</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">training_data_uri</span><span class="p">,</span><span class="n">output_data_uri</span><span class="p">,</span><span class="n">ckpt_data_uri</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>('s3://edumunozsala-ml-sagemaker/transformer-nmt/train',
+ 's3://edumunozsala-ml-sagemaker/transformer-nmt',
+ 's3://edumunozsala-ml-sagemaker/transformer-nmt/ckpt')</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then we can upload to the training data folder in S3 the files necessary for training: training data, non breaking prefixes for the inputs (English) and the non breaking prefixes for the outputs (Spanish). Once uploaded they can be loaded for training in the SageMaker container.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="n">sagemaker_session</span><span class="o">.</span><span class="n">upload_data</span><span class="p">(</span><span class="n">train_file</span><span class="p">,</span>
+                              <span class="n">bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> 
+                              <span class="n">key_prefix</span><span class="o">=</span><span class="n">training_folder</span><span class="p">)</span>
+
+<span class="n">sagemaker_session</span><span class="o">.</span><span class="n">upload_data</span><span class="p">(</span><span class="n">non_breaking_en_file</span><span class="p">,</span>
+                              <span class="n">bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> 
+                              <span class="n">key_prefix</span><span class="o">=</span><span class="n">training_folder</span><span class="p">)</span>
+
+<span class="n">sagemaker_session</span><span class="o">.</span><span class="n">upload_data</span><span class="p">(</span><span class="n">non_breaking_es_file</span><span class="p">,</span>
+                              <span class="n">bucket</span><span class="o">=</span><span class="n">bucket_name</span><span class="p">,</span> 
+                              <span class="n">key_prefix</span><span class="o">=</span><span class="n">training_folder</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>'s3://edumunozsala-ml-sagemaker/transformer-nmt/train/nonbreaking_prefix.es'</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Create-an-experiment-and-trial">
+<a class="anchor" href="#Create-an-experiment-and-trial" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create an experiment and trial<a class="anchor-link" href="#Create-an-experiment-and-trial"> </a>
+</h1>
+<p><em>Amazon SageMaker Experiments</em> is a capability of Amazon SageMaker that lets you organize, track, compare, and evaluate your machine learning experiments.</p>
+<p>Machine learning is an iterative process. You need to experiment with multiple combinations of data, algorithm and parameters, all the while observing the impact of incremental changes on model accuracy. Over time this iterative experimentation can result in thousands of model training runs and model versions. This makes it hard to track the best performing models and their input configurations. It’s also difficult to compare active experiments with past experiments to identify opportunities for further incremental improvements.</p>
+<p>Experiments will help us to organize and manage all executions, metrics and results of a ML project.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Install the library necessary to handle experiments</span>
+<span class="o">!</span>pip install sagemaker-experiments
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Collecting sagemaker-experiments
+  Using cached sagemaker_experiments-0.1.24-py3-none-any.whl (36 kB)
+Requirement already satisfied: boto3&gt;=1.12.8 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from sagemaker-experiments) (1.16.9)
+Requirement already satisfied: s3transfer&lt;0.4.0,&gt;=0.3.0 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from boto3&gt;=1.12.8-&gt;sagemaker-experiments) (0.3.3)
+Requirement already satisfied: jmespath&lt;1.0.0,&gt;=0.7.1 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from boto3&gt;=1.12.8-&gt;sagemaker-experiments) (0.10.0)
+Requirement already satisfied: botocore&lt;1.20.0,&gt;=1.19.9 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from boto3&gt;=1.12.8-&gt;sagemaker-experiments) (1.19.9)
+Requirement already satisfied: python-dateutil&lt;3.0.0,&gt;=2.1 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from botocore&lt;1.20.0,&gt;=1.19.9-&gt;boto3&gt;=1.12.8-&gt;sagemaker-experiments) (2.8.1)
+Requirement already satisfied: urllib3&lt;1.26,&gt;=1.25.4; python_version != "3.4" in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from botocore&lt;1.20.0,&gt;=1.19.9-&gt;boto3&gt;=1.12.8-&gt;sagemaker-experiments) (1.25.10)
+Requirement already satisfied: six&gt;=1.5 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from python-dateutil&lt;3.0.0,&gt;=2.1-&gt;botocore&lt;1.20.0,&gt;=1.19.9-&gt;boto3&gt;=1.12.8-&gt;sagemaker-experiments) (1.14.0)
+Installing collected packages: sagemaker-experiments
+Successfully installed sagemaker-experiments-0.1.24
+<span class="ansi-yellow-fg">WARNING: You are using pip version 20.0.2; however, version 20.2.4 is available.
+You should consider upgrading via the '/home/ec2-user/anaconda3/envs/tensorflow2_p36/bin/python -m pip install --upgrade pip' command.</span>
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Load the libraries to handle experiments</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Import the libraries to work with Experiments in SageMaker</span>
+<span class="kn">from</span> <span class="nn">smexperiments.experiment</span> <span class="kn">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span> <span class="nn">smexperiments.trial</span> <span class="kn">import</span> <span class="n">Trial</span>
+<span class="kn">from</span> <span class="nn">smexperiments.trial_component</span> <span class="kn">import</span> <span class="n">TrialComponent</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Set the experiment and trial name and one tag to help us to identify the reason for this items.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the experiment name</span>
+<span class="n">experiment_name</span><span class="o">=</span><span class="s1">'tf-transformer'</span>
+<span class="c1"># Set the trial name </span>
+<span class="n">trial_name</span><span class="o">=</span><span class="s2">"</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">,</span><span class="s1">'single-gpu'</span><span class="p">)</span>
+
+<span class="n">tags</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">'Key'</span><span class="p">:</span> <span class="s1">'my-experiments'</span><span class="p">,</span> <span class="s1">'Value'</span><span class="p">:</span> <span class="s1">'transformerEngSpa1'</span><span class="p">}]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can create an experiment to track all the model training iterations. Experiments are a great way to organize your data science work. You can create experiments to organize all your model development work for : a business use case you are addressing (e.g. create experiment named “customer churn prediction”), or a data science team that owns the experiment (e.g. create experiment named “marketing analytics experiment”), or a specific data science and ML project. Think of it as a “folder” for organizing your “files”.</p>
+<p>We will create a Trial to track each training job run. But this is just a simple example, not intented to explore all the capabilities of the product.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># create the experiment if it doesn't exist</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">training_experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Loaded experiment '</span><span class="p">,</span><span class="n">experiment_name</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"ResourceNotFound"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+        <span class="n">training_experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">,</span>
+                                      <span class="n">description</span> <span class="o">=</span> <span class="s2">"Experiment to track trainings on my tensorflow Transformer Eng-Spa"</span><span class="p">,</span> 
+                                      <span class="n">tags</span> <span class="o">=</span> <span class="n">tags</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Created experiment '</span><span class="p">,</span><span class="n">experiment_name</span><span class="p">)</span>
+<span class="c1"># create the trial if it doesn't exist</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">single_gpu_trial</span> <span class="o">=</span> <span class="n">Trial</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">trial_name</span><span class="o">=</span><span class="n">trial_name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Loaded trial '</span><span class="p">,</span><span class="n">trial_name</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"ResourceNotFound"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+        <span class="n">single_gpu_trial</span> <span class="o">=</span> <span class="n">Trial</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">,</span> 
+                             <span class="n">trial_name</span><span class="o">=</span> <span class="n">trial_name</span><span class="p">,</span>
+                             <span class="n">tags</span> <span class="o">=</span> <span class="n">tags</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Created trial '</span><span class="p">,</span><span class="n">trial_name</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Loaded experiment  tf-transformer
+Loaded trial  tf-transformer-single-gpu
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Trackers">
+<a class="anchor" href="#Trackers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Trackers<a class="anchor-link" href="#Trackers"> </a>
+</h2>
+<p>Another interesting tool to mention, is Tracker objects. They can store information about different types of topics or objects in our model or training process like inputs, parameters, artifacts or metrics. The tracker is attached to a trial, associating the object to the training job. We can record that information and analyze it later on the experiment. <strong>Note</strong> that only parameters, input artifacts, and output artifacts are saved to SageMaker. Metrics are saved to file.</p>
+<p>As an example, we create a Tracker to register the input data and two parameters about how that data is processed in our project.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">smexperiments.tracker</span> <span class="kn">import</span> <span class="n">Tracker</span>
+<span class="c1"># Create the tracker for the inout data</span>
+<span class="n">tracker_name</span><span class="o">=</span><span class="s1">'TextPreprocessing'</span>
+<span class="n">trial_comp_name</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Change to a an exsting TrialComponent to load it</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">trial_component_name</span><span class="o">=</span><span class="n">trial_comp_name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Loaded Tracker '</span><span class="p">,</span><span class="n">tracker_name</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">display_name</span><span class="o">=</span><span class="n">tracker_name</span><span class="p">)</span>
+    <span class="n">tracker</span><span class="o">.</span><span class="n">log_input</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"EngtoSpa Translations"</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">"s3/uri"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span>
+    <span class="n">tracker</span><span class="o">.</span><span class="n">log_parameters</span><span class="p">({</span>
+        <span class="s2">"Tokenizer"</span><span class="p">:</span> <span class="s1">'Subword'</span><span class="p">,</span>
+        <span class="s2">"Max Length"</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="p">})</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Created Tracker '</span><span class="p">,</span><span class="n">tracker_name</span><span class="p">)</span>
+    
+<span class="c1"># Atach the Tracker to the trial</span>
+<span class="n">single_gpu_trial</span><span class="o">.</span><span class="n">add_trial_component</span><span class="p">(</span><span class="n">tracker</span><span class="o">.</span><span class="n">trial_component</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Created Tracker  TextPreprocessing
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our last step consist in create the experiment configuration, a dictionary that contains the experiment name, the trial name and the trial component and it will be used to label our training job.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create a configuration definition for our experiment and trial</span>
+<span class="n">trial_comp_name</span> <span class="o">=</span> <span class="s1">'single-gpu-components'</span>
+<span class="c1"># Set the configuration parameters for the experiment</span>
+<span class="n">experiment_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'ExperimentName'</span><span class="p">:</span> <span class="n">training_experiment</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">,</span> 
+                       <span class="s1">'TrialName'</span><span class="p">:</span> <span class="n">single_gpu_trial</span><span class="o">.</span><span class="n">trial_name</span><span class="p">,</span>
+                       <span class="s1">'TrialComponentDisplayName'</span><span class="p">:</span> <span class="n">trial_comp_name</span><span class="p">}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Check and show information about the experiment and trial</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'Experiment: '</span><span class="p">,</span><span class="n">training_experiment</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
+<span class="c1"># Show the trials in the experiment</span>
+<span class="c1">#for trial in training_experiment.list_trials():</span>
+    <span class="c1">#print('Trial: ',trial.trial_name)</span>
+
+<span class="k">for</span> <span class="n">trial_comp</span> <span class="ow">in</span> <span class="n">TrialComponent</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="n">trial_name</span><span class="o">=</span><span class="n">single_gpu_trial</span><span class="o">.</span><span class="n">trial_name</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Trial Components: '</span><span class="p">,</span><span class="n">trial_comp</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Experiment:  tf-transformer
+Trial Components:  TrialComponentSummary(trial_component_name='TrialComponent-2020-11-12-115920-sbov',trial_component_arn='arn:aws:sagemaker:us-east-1:223817798831:experiment-trial-component/trialcomponent-2020-11-12-115920-sbov',display_name='TextPreprocessing',creation_time=datetime.datetime(2020, 11, 12, 11, 59, 20, 739000, tzinfo=tzlocal()),created_by={},last_modified_time=datetime.datetime(2020, 11, 12, 11, 59, 20, 739000, tzinfo=tzlocal()),last_modified_by={})
+Trial Components:  TrialComponentSummary(trial_component_name='tf-transformer-single-gpu-2020-11-12-11-44-28-aws-training-job',trial_component_arn='arn:aws:sagemaker:us-east-1:223817798831:experiment-trial-component/tf-transformer-single-gpu-2020-11-12-11-44-28-aws-training-job',display_name='single-gpu-components',trial_component_source={'SourceArn': 'arn:aws:sagemaker:us-east-1:223817798831:training-job/tf-transformer-single-gpu-2020-11-12-11-44-28', 'SourceType': 'SageMakerTrainingJob'},status=TrialComponentStatus(primary_status='Failed',message='Status: Failed, secondary status: Failed, failure reason: AlgorithmError: ExecuteUserScriptError:\nCommand "/usr/bin/python3 train.py --epochs 8 --model_dir s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-11-44-28/model --non_breaking_in nonbreaking_prefix.en --non_breaking_out nonbreaking_prefix.es --nsamples 60000 --resume False --train_file spa.txt".'),creation_time=datetime.datetime(2020, 11, 12, 11, 44, 32, 948000, tzinfo=tzlocal()),created_by={},last_modified_time=datetime.datetime(2020, 11, 12, 11, 50, 27, 732000, tzinfo=tzlocal()),last_modified_by={})
+Trial Components:  TrialComponentSummary(trial_component_name='TrialComponent-2020-11-12-113905-rpfc',trial_component_arn='arn:aws:sagemaker:us-east-1:223817798831:experiment-trial-component/trialcomponent-2020-11-12-113905-rpfc',display_name='TextPreprocessing',creation_time=datetime.datetime(2020, 11, 12, 11, 39, 5, 995000, tzinfo=tzlocal()),created_by={},last_modified_time=datetime.datetime(2020, 11, 12, 11, 39, 5, 995000, tzinfo=tzlocal()),last_modified_by={})
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Construct-a-script-for-training">
+<a class="anchor" href="#Construct-a-script-for-training" aria-hidden="true"><span class="octicon octicon-link"></span></a>Construct a script for training<a class="anchor-link" href="#Construct-a-script-for-training"> </a>
+</h1>
+<p>Script mode is a training script format for TensorFlow that lets you execute any TensorFlow training script in SageMaker with minimal modification. The SageMaker Python SDK handles transferring your script to a SageMaker training instance. On the training instance, SageMaker's native TensorFlow support sets up training-related environment variables and executes your training script. In this tutorial, we use the SageMaker Python SDK to launch a training job.</p>
+<p>Script mode supports training with a Python script, a Python module, or a shell script.</p>
+<p>This project's training script was adapted from the Tensorflow model of a Transformer, we develop in a previous post (mentioned previously). We have modified it to handle:</p>
+<ul>
+<li>
+<p>the <code>train_file</code>, <code>non_breaking_in</code>and <code>non_breaking_out</code> parameters passed in with the values of the training data-set, the non breaking prefixes for the input data and the non breaking prefixes for the output data.</p>
+</li>
+<li>
+<p>the <code>data_dir</code> parameter passed in by SageMaker with the value of the enviroment variable <code>SM_CHANNEL_TRAINING</code>. This is an S3 path used for input data sharing during training.</p>
+</li>
+<li>
+<p>the <code>model_dir</code> parameter passed in by SageMaker. This is an S3 path which can be used for data sharing during distributed training and checkpointing and/or model persistence. We have also added an argument-parsing function to handle processing training-related variables.</p>
+</li>
+<li>
+<p>the local checkpoint path to store the model checkpoints during training. We use the default value <code>/opt/ml/checkpoints</code> that will be uploaded to S3. We comment this behavior later when defining our estimator.</p>
+</li>
+<li>
+<p>At the end of the training job we have added a step to export the trained model, only the weights, to the path stored in the environment variable <code>SM_MODEL_DIR</code>, which always points to <code>/opt/ml/model</code>. This is critical because SageMaker uploads all the model artifacts in this folder to S3 at end of training.</p>
+</li>
+<li>
+<p>the <code>output_data_dir</code> parameter passed in by SageMaker with the value of the enviroment variable <code>SM_OUTPUT_DATA_DIR</code>. This is a folder path used to save output data from our model. This folder will be uploaded to S3 to store the output.tar.zip. In our case we need to save the tokenizer for the input texts, the tokenizer for the outputs, the input and output vocab size and the tokens for <code>eos</code> and <code>sos</code>.</p>
+</li>
+</ul>
+<p>In addition to the train.py file, our source code folder includes the files:</p>
+<ul>
+<li>model.py: Tensorflow model definition</li>
+<li>utils.py: utility functions to process the text data </li>
+<li>utils_train.py: contains functions to calculate the loss and learning rate scheduler.</li>
+</ul>
+<p>Here is the entire script for the train.py file:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>pygmentize <span class="s1">'train/train.py'</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre><span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">argparse</span>
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">json</span>
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">sys</span>
+<span class="ansi-white-fg">#import sagemaker_containers</span>
+
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">math</span>
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">os</span>
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">gc</span>
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">time</span>
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">pandas</span> <span class="ansi-blue-fg">as</span> <span class="ansi-cyan-fg ansi-underline">pd</span>
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">pickle</span>
+
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">tensorflow</span> <span class="ansi-blue-fg">as</span> <span class="ansi-cyan-fg ansi-underline">tf</span>
+
+<span class="ansi-white-fg"># To install tensorflow_datasets</span>
+<span class="ansi-blue-fg">import</span> <span class="ansi-cyan-fg ansi-underline">subprocess</span>
+
+<span class="ansi-blue-fg">def</span> <span class="ansi-green-fg">install</span>(package):
+    subprocess.check_call([sys.executable, <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">-q</span><span class="ansi-yellow-fg">"</span>, <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">-m</span><span class="ansi-yellow-fg">"</span>, <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">pip</span><span class="ansi-yellow-fg">"</span>, <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">install</span><span class="ansi-yellow-fg">"</span>, package])
+
+<span class="ansi-white-fg"># Install the library tensorflow_datasets</span>
+install(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">tensorflow_datasets</span><span class="ansi-yellow-fg">'</span>)
+
+<span class="ansi-blue-fg">from</span> <span class="ansi-cyan-fg ansi-underline">utils</span> <span class="ansi-blue-fg">import</span> preprocess_text_nonbreaking, subword_tokenize
+<span class="ansi-white-fg">#from utils_train import loss_function, CustomSchedule</span>
+
+<span class="ansi-blue-fg">from</span> <span class="ansi-cyan-fg ansi-underline">model</span> <span class="ansi-blue-fg">import</span> Transformer
+
+INPUT_COLUMN = <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">input</span><span class="ansi-yellow-fg">'</span>
+TARGET_COLUMN = <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">target</span><span class="ansi-yellow-fg">'</span>
+<span class="ansi-white-fg">#NUM_SAMPLES = 80000 #40000</span>
+<span class="ansi-white-fg">#MAX_VOCAB_SIZE = 2**14</span>
+
+<span class="ansi-white-fg">#BATCH_SIZE = 64  # Batch size for training.</span>
+<span class="ansi-white-fg">#EPOCHS = 10  # Number of epochs to train for.</span>
+<span class="ansi-white-fg">#MAX_LENGTH = 15</span>
+
+<span class="ansi-blue-fg">def</span> <span class="ansi-green-fg">get_train_data</span>(training_dir, nonbreaking_in, nonbreaking_out, train_file, nsamples):
+    <span class="ansi-white-fg"># Load the nonbreaking files</span>
+    <span class="ansi-blue-fg">with</span> <span class="ansi-cyan-fg">open</span>(os.path.join(training_dir, nonbreaking_in), 
+        mode = <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">r</span><span class="ansi-yellow-fg">"</span>, encoding = <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">utf-8</span><span class="ansi-yellow-fg">"</span>) <span class="ansi-blue-fg">as</span> f:
+        non_breaking_prefix_en = f.read()
+    <span class="ansi-blue-fg">with</span> <span class="ansi-cyan-fg">open</span>(os.path.join(training_dir, nonbreaking_out), 
+        mode = <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">r</span><span class="ansi-yellow-fg">"</span>, encoding = <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">utf-8</span><span class="ansi-yellow-fg">"</span>) <span class="ansi-blue-fg">as</span> f:
+        non_breaking_prefix_es = f.read()
+
+    non_breaking_prefix_en = non_breaking_prefix_en.split(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">\n</span><span class="ansi-yellow-fg">"</span>)
+    non_breaking_prefix_en = [<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg"> </span><span class="ansi-yellow-fg">'</span> + pref + <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">.</span><span class="ansi-yellow-fg">'</span> <span class="ansi-blue-fg">for</span> pref <span class="ansi-magenta-fg">in</span> non_breaking_prefix_en]
+    non_breaking_prefix_es = non_breaking_prefix_es.split(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">\n</span><span class="ansi-yellow-fg">"</span>)
+    non_breaking_prefix_es = [<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg"> </span><span class="ansi-yellow-fg">'</span> + pref + <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">.</span><span class="ansi-yellow-fg">'</span> <span class="ansi-blue-fg">for</span> pref <span class="ansi-magenta-fg">in</span> non_breaking_prefix_es]
+    <span class="ansi-white-fg"># Load the training data</span>
+    <span class="ansi-white-fg"># Load the dataset: sentence in english, sentence in spanish </span>
+    df=pd.read_csv(os.path.join(training_dir, train_file), sep=<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">\t</span><span class="ansi-yellow-fg">"</span>, header=<span class="ansi-blue-fg">None</span>, names=[INPUT_COLUMN,TARGET_COLUMN], usecols=[<span class="ansi-blue-fg">0</span>,<span class="ansi-blue-fg">1</span>], 
+               nrows=nsamples)
+    <span class="ansi-white-fg"># Preprocess the input data</span>
+    input_data=df[INPUT_COLUMN].apply(<span class="ansi-blue-fg">lambda</span> x : preprocess_text_nonbreaking(x, non_breaking_prefix_en)).tolist()
+    <span class="ansi-white-fg"># Preprocess and include the end of sentence token to the target text</span>
+    target_data=df[TARGET_COLUMN].apply(<span class="ansi-blue-fg">lambda</span> x : preprocess_text_nonbreaking(x, non_breaking_prefix_es)).tolist()
+
+    <span class="ansi-blue-fg">return</span> input_data, target_data
+
+<span class="ansi-blue-fg">def</span> <span class="ansi-green-fg">main_train</span>(dataset, transformer, n_epochs, print_every=<span class="ansi-blue-fg">50</span>):
+  <span class="ansi-yellow-fg">''' Train the transformer model for n_epochs using the data generator dataset'''</span>
+  losses = []
+  accuracies = []
+  <span class="ansi-white-fg"># In every epoch</span>
+  <span class="ansi-blue-fg">for</span> epoch <span class="ansi-magenta-fg">in</span> <span class="ansi-cyan-fg">range</span>(n_epochs):
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Starting epoch </span><span class="ansi-yellow-fg">{}</span><span class="ansi-yellow-fg">"</span>.format(epoch+<span class="ansi-blue-fg">1</span>))
+    start = time.time()
+    <span class="ansi-white-fg"># Reset the losss and accuracy calculations</span>
+    train_loss.reset_states()
+    train_accuracy.reset_states()
+    <span class="ansi-white-fg"># Get a batch of inputs and targets</span>
+    <span class="ansi-blue-fg">for</span> (batch, (enc_inputs, targets)) <span class="ansi-magenta-fg">in</span> <span class="ansi-cyan-fg">enumerate</span>(dataset):
+        <span class="ansi-white-fg"># Set the decoder inputs</span>
+        dec_inputs = targets[:, :-<span class="ansi-blue-fg">1</span>]
+        <span class="ansi-white-fg"># Set the target outputs, right shifted</span>
+        dec_outputs_real = targets[:, <span class="ansi-blue-fg">1</span>:]
+        <span class="ansi-blue-fg">with</span> tf.GradientTape() <span class="ansi-blue-fg">as</span> tape:
+            <span class="ansi-white-fg"># Call the transformer and get the predicted output</span>
+            predictions = transformer(enc_inputs, dec_inputs, <span class="ansi-blue-fg">True</span>)
+            <span class="ansi-white-fg"># Calculate the loss</span>
+            loss = loss_function(dec_outputs_real, predictions)
+        <span class="ansi-white-fg"># Update the weights and optimizer</span>
+        gradients = tape.gradient(loss, transformer.trainable_variables)
+        optimizer.apply_gradients(<span class="ansi-cyan-fg">zip</span>(gradients, transformer.trainable_variables))
+        <span class="ansi-white-fg"># Save and store the metrics</span>
+        train_loss(loss)
+        train_accuracy(dec_outputs_real, predictions)
+        
+        <span class="ansi-blue-fg">if</span> batch % print_every == <span class="ansi-blue-fg">0</span>:
+            losses.append(train_loss.result())
+            accuracies.append(train_accuracy.result())
+            <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Epoch </span><span class="ansi-yellow-fg">{}</span><span class="ansi-yellow-fg"> Batch </span><span class="ansi-yellow-fg">{}</span><span class="ansi-yellow-fg"> Loss </span><span class="ansi-yellow-fg">{:.4f}</span><span class="ansi-yellow-fg"> Accuracy </span><span class="ansi-yellow-fg">{:.4f}</span><span class="ansi-yellow-fg">"</span>.format(
+                epoch+<span class="ansi-blue-fg">1</span>, batch, train_loss.result(), train_accuracy.result()))
+            
+    <span class="ansi-white-fg"># Checkpoint the model on every epoch        </span>
+    ckpt_save_path = ckpt_manager.save()
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Saving checkpoint for epoch </span><span class="ansi-yellow-fg">{}</span><span class="ansi-yellow-fg"> in </span><span class="ansi-yellow-fg">{}</span><span class="ansi-yellow-fg">"</span>.format(epoch+<span class="ansi-blue-fg">1</span>,
+                                                        ckpt_save_path))
+    <span class="ansi-white-fg">#print("Time for 1 epoch: {} secs\n".format(time.time() - start))</span>
+    <span class="ansi-white-fg"># Save the model</span>
+    <span class="ansi-white-fg">#transformer.save(args.sm_model_dir, overwrite=True, save_format='tf')</span>
+    
+  <span class="ansi-blue-fg">return</span> losses, accuracies
+
+
+<span class="ansi-blue-fg">def</span> <span class="ansi-green-fg">loss_function</span>(target, pred):
+    mask = tf.math.logical_not(tf.math.equal(target, <span class="ansi-blue-fg">0</span>))
+    loss_ = loss_object(target, pred)
+    
+    mask = tf.cast(mask, dtype=loss_.dtype)
+    loss_ *= mask
+    
+    <span class="ansi-blue-fg">return</span> tf.reduce_mean(loss_)
+
+<span class="ansi-blue-fg">class</span> <span class="ansi-green-fg ansi-underline">CustomSchedule</span>(tf.keras.optimizers.schedules.LearningRateSchedule):
+    
+    <span class="ansi-blue-fg">def</span> <span class="ansi-green-fg">__init__</span>(<span class="ansi-cyan-fg">self</span>, d_model, warmup_steps=<span class="ansi-blue-fg">4000</span>):
+        <span class="ansi-cyan-fg">super</span>(CustomSchedule, <span class="ansi-cyan-fg">self</span>).<span class="ansi-green-fg">__init__</span>()
+        
+        <span class="ansi-cyan-fg">self</span>.d_model = tf.cast(d_model, tf.float32)
+        <span class="ansi-cyan-fg">self</span>.warmup_steps = warmup_steps
+    
+    <span class="ansi-blue-fg">def</span> <span class="ansi-green-fg">__call__</span>(<span class="ansi-cyan-fg">self</span>, step):
+        arg1 = tf.math.rsqrt(step)
+        arg2 = step * (<span class="ansi-cyan-fg">self</span>.warmup_steps**-<span class="ansi-blue-fg">1.5</span>)
+        
+        <span class="ansi-blue-fg">return</span> tf.math.rsqrt(<span class="ansi-cyan-fg">self</span>.d_model) * tf.math.minimum(arg1, arg2)
+
+
+<span class="ansi-blue-fg">if</span> <span class="ansi-red-fg">__name__</span> == <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">__main__</span><span class="ansi-yellow-fg">'</span>:
+    <span class="ansi-white-fg"># Install tensorflow_datasets</span>
+    <span class="ansi-white-fg">#install('tensorflow_datasets')</span>
+
+    <span class="ansi-white-fg"># All of the model parameters and training parameters are sent as arguments when the script</span>
+    <span class="ansi-white-fg"># is executed. Here we set up an argument parser to easily access the parameters.</span>
+
+    parser = argparse.ArgumentParser()
+
+    <span class="ansi-white-fg"># Training Parameters</span>
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--batch-size</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">64</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">input batch size for training (default: 64)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--max-len</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">15</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">input max sequence length for training (default: 60)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--epochs</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">2</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">number of epochs to train (default: 2)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--nsamples</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">10000</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">number of samples to train (default: 20000)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--resume</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">bool</span>, default=<span class="ansi-blue-fg">False</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Resume training from the latest checkpoint (default: False)</span><span class="ansi-yellow-fg">'</span>)
+
+    <span class="ansi-white-fg"># Data parameters                    </span>
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--train_file</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">str</span>, default=<span class="ansi-blue-fg">None</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Training data file name</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--non_breaking_in</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">str</span>, default=<span class="ansi-blue-fg">None</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Non breaking prefixes for input vocabulary</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--non_breaking_out</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">str</span>, default=<span class="ansi-blue-fg">None</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Non breaking prefixes for output vocabulary</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--seed</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">1</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">S</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">random seed (default: 1)</span><span class="ansi-yellow-fg">'</span>)
+
+    <span class="ansi-white-fg"># Model Parameters</span>
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--d_model</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">64</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Model dimension (default: 64)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--ffn_dim</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">128</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">size of the FFN layer (default: 128)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--vocab_size</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">10000</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">size of the vocabulary (default: 10000)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--n_layers</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">4</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">number of layers (default: 4)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--n_heads</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=<span class="ansi-blue-fg">8</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">number of heads (default: 8)</span><span class="ansi-yellow-fg">'</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--dropout_rate</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">float</span>, default=<span class="ansi-blue-fg">0.1</span>, metavar=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">N</span><span class="ansi-yellow-fg">'</span>,
+                        help=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Dropout rate (default: 0.1)</span><span class="ansi-yellow-fg">'</span>)
+
+    <span class="ansi-white-fg"># SageMaker Parameters</span>
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--hosts</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">list</span>, default=json.loads(os.environ[<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">SM_HOSTS</span><span class="ansi-yellow-fg">'</span>]))
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--current-host</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">str</span>, default=os.environ[<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">SM_CURRENT_HOST</span><span class="ansi-yellow-fg">'</span>])
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--sm-model-dir</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">str</span>, default=os.environ[<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">SM_MODEL_DIR</span><span class="ansi-yellow-fg">'</span>])
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--model_dir</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">str</span>)
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--data-dir</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">str</span>, default=os.environ[<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">SM_CHANNEL_TRAINING</span><span class="ansi-yellow-fg">'</span>])
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--num-gpus</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">int</span>, default=os.environ[<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">SM_NUM_GPUS</span><span class="ansi-yellow-fg">'</span>])
+    parser.add_argument(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">--output-data-dir</span><span class="ansi-yellow-fg">'</span>, <span class="ansi-cyan-fg">type</span>=<span class="ansi-cyan-fg">str</span>, default=os.environ[<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">SM_OUTPUT_DATA_DIR</span><span class="ansi-yellow-fg">'</span>])
+
+    args = parser.parse_args()
+
+    <span class="ansi-cyan-fg">print</span>(args.sm_model_dir, args.model_dir)
+    <span class="ansi-white-fg"># Load the training data.</span>
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Get the train data</span><span class="ansi-yellow-fg">"</span>)
+    input_data, target_data = get_train_data(args.data_dir, args.non_breaking_in, args.non_breaking_out, args.train_file, args.nsamples)
+
+    <span class="ansi-white-fg"># Tokenize and pad the input sequences</span>
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Tokenize the input and output data and create the vocabularies</span><span class="ansi-yellow-fg">"</span>) 
+    encoder_inputs, tokenizer_inputs, num_words_inputs, sos_token_input, eos_token_input, del_idx_inputs= subword_tokenize(input_data, 
+                                                                                                        args.vocab_size, args.max_len)
+    <span class="ansi-white-fg"># Tokenize and pad the outputs sequences</span>
+    decoder_outputs, tokenizer_outputs, num_words_output, sos_token_output, eos_token_output, del_idx_outputs = subword_tokenize(target_data,                                                                                                       args.vocab_size, args.max_len)
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Input vocab: </span><span class="ansi-yellow-fg">'</span>,num_words_inputs)
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Output vocab: </span><span class="ansi-yellow-fg">'</span>,num_words_output)
+    
+    <span class="ansi-white-fg"># Define a dataset </span>
+    dataset = tf.data.Dataset.from_tensor_slices(
+                    (encoder_inputs, decoder_outputs))
+    dataset = dataset.shuffle(<span class="ansi-cyan-fg">len</span>(input_data), reshuffle_each_iteration=<span class="ansi-blue-fg">True</span>).batch(
+                    args.batch_size, drop_remainder=<span class="ansi-blue-fg">True</span>)
+    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+
+    <span class="ansi-white-fg"># Clean the session</span>
+    tf.keras.backend.clear_session()
+    <span class="ansi-white-fg"># Create the Transformer model</span>
+    transformer = Transformer(vocab_size_enc=num_words_inputs,
+                          vocab_size_dec=num_words_output,
+                          d_model=args.d_model,
+                          n_layers=args.n_layers,
+                          FFN_units=args.ffn_dim,
+                          n_heads=args.n_heads,
+                          dropout_rate=args.dropout_rate)
+
+    <span class="ansi-white-fg"># Define a categorical cross entropy loss</span>
+    loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=<span class="ansi-blue-fg">True</span>,
+                                                            reduction=<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">none</span><span class="ansi-yellow-fg">"</span>)
+    <span class="ansi-white-fg"># Define a metric to store the mean loss of every epoch</span>
+    train_loss = tf.keras.metrics.Mean(name=<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">train_loss</span><span class="ansi-yellow-fg">"</span>)
+    <span class="ansi-white-fg"># Define a matric to save the accuracy in every epoch</span>
+    train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name=<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">train_accuracy</span><span class="ansi-yellow-fg">"</span>)
+    <span class="ansi-white-fg"># Create the scheduler for learning rate decay</span>
+    leaning_rate = CustomSchedule(args.d_model)
+    <span class="ansi-white-fg"># Create the Adam optimizer</span>
+    optimizer = tf.keras.optimizers.Adam(leaning_rate,
+                                     beta_1=<span class="ansi-blue-fg">0.9</span>,
+                                     beta_2=<span class="ansi-blue-fg">0.98</span>,
+                                     epsilon=<span class="ansi-blue-fg">1e-9</span>)
+
+    <span class="ansi-white-fg">#Create the Checkpoint </span>
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Creating the checkpoint ...</span><span class="ansi-yellow-fg">'</span>)
+    ckpt = tf.train.Checkpoint(transformer=transformer,
+                           optimizer=optimizer)
+
+    ckpt_manager = tf.train.CheckpointManager(ckpt, <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">/opt/ml/checkpoints/</span><span class="ansi-yellow-fg">'</span>, max_to_keep=<span class="ansi-blue-fg">1</span>)
+    <span class="ansi-white-fg"># Restore from the latest checkpoint if requiered</span>
+    <span class="ansi-blue-fg">if</span> ckpt_manager.latest_checkpoint <span class="ansi-magenta-fg">and</span> args.resume:
+        ckpt.restore(ckpt_manager.latest_checkpoint)
+        <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Last checkpoint restored.</span><span class="ansi-yellow-fg">"</span>)
+    <span class="ansi-white-fg"># to save the model in tf 2.1.0</span>
+    <span class="ansi-white-fg">#print('Preparing the model to be saved....')</span>
+    <span class="ansi-white-fg">#for enc_inputs, targets in dataset.take(1):</span>
+    <span class="ansi-white-fg">#    dec_inputs = targets[:, :-1]</span>
+    <span class="ansi-white-fg">#    print (enc_inputs.shape, dec_inputs.shape)</span>
+    <span class="ansi-white-fg">#    transformer._set_inputs(enc_inputs, dec_inputs, True)</span>
+
+    <span class="ansi-white-fg"># Train the model</span>
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Training the model ....</span><span class="ansi-yellow-fg">'</span>)
+    losses, accuracies = main_train(dataset, transformer, args.epochs, <span class="ansi-blue-fg">100</span>)
+
+    <span class="ansi-white-fg"># Save the while model</span>
+    <span class="ansi-white-fg"># Save the entire model to a HDF5 file</span>
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Saving the model ....</span><span class="ansi-yellow-fg">'</span>)
+    transformer.save_weights(os.path.join(args.sm_model_dir, <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">transformer</span><span class="ansi-yellow-fg">'</span>), overwrite=<span class="ansi-blue-fg">True</span>, save_format=<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">tf</span><span class="ansi-yellow-fg">'</span>)
+    <span class="ansi-white-fg">#transformer.save_weights(args.sm_model_dir, overwrite=True, save_format='tf')</span>
+    <span class="ansi-white-fg"># Save the parameters used to construct the model</span>
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Saving the model parameters</span><span class="ansi-yellow-fg">"</span>)
+    model_info_path = os.path.join(args.output_data_dir, <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">model_info.pth</span><span class="ansi-yellow-fg">'</span>)
+    <span class="ansi-blue-fg">with</span> <span class="ansi-cyan-fg">open</span>(model_info_path, <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">wb</span><span class="ansi-yellow-fg">'</span>) <span class="ansi-blue-fg">as</span> f:
+        model_info = {
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">vocab_size_enc</span><span class="ansi-yellow-fg">'</span>: num_words_inputs,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">vocab_size_dec</span><span class="ansi-yellow-fg">'</span>: num_words_output,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">sos_token_input</span><span class="ansi-yellow-fg">'</span>: sos_token_input,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">eos_token_input</span><span class="ansi-yellow-fg">'</span>: eos_token_input,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">sos_token_output</span><span class="ansi-yellow-fg">'</span>: sos_token_output,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">eos_token_output</span><span class="ansi-yellow-fg">'</span>: eos_token_output,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">n_layers</span><span class="ansi-yellow-fg">'</span>: args.n_layers,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">d_model</span><span class="ansi-yellow-fg">'</span>: args.d_model,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">ffn_dim</span><span class="ansi-yellow-fg">'</span>: args.ffn_dim,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">n_heads</span><span class="ansi-yellow-fg">'</span>: args.n_heads,
+            <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">drop_rate</span><span class="ansi-yellow-fg">'</span>: args.dropout_rate
+        }
+        pickle.dump(model_info, f)
+          
+	<span class="ansi-white-fg"># Save the tokenizers with the vocabularies</span>
+    <span class="ansi-cyan-fg">print</span>(<span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">Saving the dictionaries ....</span><span class="ansi-yellow-fg">'</span>)
+    vocabulary_in = os.path.join(args.output_data_dir, <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">in_vocab.pkl</span><span class="ansi-yellow-fg">'</span>)
+    <span class="ansi-blue-fg">with</span> <span class="ansi-cyan-fg">open</span>(vocabulary_in, <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">wb</span><span class="ansi-yellow-fg">'</span>) <span class="ansi-blue-fg">as</span> f:
+        pickle.dump(tokenizer_inputs, f)
+
+    vocabulary_out = os.path.join(args.output_data_dir, <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">out_vocab.pkl</span><span class="ansi-yellow-fg">'</span>)
+    <span class="ansi-blue-fg">with</span> <span class="ansi-cyan-fg">open</span>(vocabulary_out, <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">wb</span><span class="ansi-yellow-fg">'</span>) <span class="ansi-blue-fg">as</span> f:
+        pickle.dump(tokenizer_outputs, f)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our source code needs the tensorflow_dataset library and it is not include in the Tensorflow 2.1. container image provided by SageMaker. To solve this issue we explicitly install it in our train.py file using the command <code>subprocess.check_call([sys.executable, "-q", "-m", "pip", "install", package])</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Create-a-training-job-using-the-TensorFlow-estimator">
+<a class="anchor" href="#Create-a-training-job-using-the-TensorFlow-estimator" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create a training job using the <code>TensorFlow</code> estimator<a class="anchor-link" href="#Create-a-training-job-using-the-TensorFlow-estimator"> </a>
+</h1>
+<p>The <code>sagemaker.tensorflow.TensorFlow</code> estimator handles locating the script mode container where the model will run, uploading your script or source code to a S3 location and creating a SageMaker training job. Let's call out a couple important parameters here:</p>
+<ul>
+<li>
+<code>source_dir</code>and <code>entry_point</code>, the folder with the source code and the file to run the training.</li>
+<li>
+<code>framework_version</code> is the tensorflow version we want to run our code.</li>
+<li>
+<code>py_version</code> is set to <code>'py3'</code> to indicate that we are using script mode since legacy mode supports only Python 2. Though Python 2 will be deprecated soon, you can use script mode with Python 2 by setting <code>py_version</code> to <code>'py2'</code> and <code>script_mode</code> to <code>True</code>.</li>
+<li>
+<code>code_location</code> is a S3 folder URI where the <code>source_dir</code> will be upload. When the instace starts the content of that folder will be downloaded to a local path, <code>opt/ml/code</code>. The <code>entry_point</code>, our main code or function, has to be included in that folder.</li>
+<li>
+<code>output_path</code> is the S3 path where all the outputs of our training job will be uploaded when the training ends. In our example we will upload to this S3 folder the local content in the folders <code>SM_MODEL_DIR</code> and <code>SM_OUTPUT_DATA_DIR</code>.</li>
+<li>the <code>checkpoint_local_path</code>and <code>checkpoint_s3_uri</code> parameters will be explained in the next section <strong>"Resume training from a checkpoint"</strong>
+</li>
+<li>
+<code>script_mode = True</code> to set script mode. </li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sagemaker.tensorflow</span> <span class="kn">import</span> <span class="n">TensorFlow</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Uncomment the type of instance to use</span>
+<span class="c1">#instance_type='ml.m4.4xlarge'</span>
+<span class="n">instance_type</span><span class="o">=</span><span class="s1">'ml.p2.xlarge'</span>
+<span class="c1">#instance_type='local'</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Another important parameter of our Tensorflow estimator is the <code>instance_type</code> that is the type of "virtual machine" where the container will run. The values we play around in this project are:</p>
+<ul>
+<li>local: The container will run locally on the notebook instance. this is very useful to debug or verify that our estimator definition is correct and the train.py runs successfully. It is much more faster to run the container locally, the start up time for a remote instance is too long when you are coding and debugging.</li>
+<li>ml.mX.Yxlarge: It is a CPU instance, when you are running your code for a short train, maybe for validation purposes. Check AWS documentation for a list of alternative instance.</li>
+<li>ml.p2.xlarge: This instance use a GPU and it is the preferred one when you want to launch a long running training.</li>
+</ul>
+<p>When running in local mode, some estimator functionalities are not available like uploading the checkpoints to S3 and its parameters should not be defined.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally we want to mention the definition of metrics. Using a dictionary, we can define a metric name and the regular expression to extract its value from the messages the training script writes on the logs or the stdout during training. Later we can see those metrics in the SageMaker console. We show you how to do it in a following section.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define the metrics to search for</span>
+<span class="n">metric_definitions</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">'Name'</span><span class="p">:</span> <span class="s1">'loss'</span><span class="p">,</span> <span class="s1">'Regex'</span><span class="p">:</span> <span class="s1">'Loss ([0-9</span><span class="se">\\</span><span class="s1">.]+)'</span><span class="p">},{</span><span class="s1">'Name'</span><span class="p">:</span> <span class="s1">'Accuracy'</span><span class="p">,</span> <span class="s1">'Regex'</span><span class="p">:</span> <span class="s1">'Accuracy ([0-9</span><span class="se">\\</span><span class="s1">.]+)'</span><span class="p">}]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we can define the estimator:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create the Tensorflow estimator using a Tensorflow 2.1 container</span>
+<span class="n">estimator</span> <span class="o">=</span> <span class="n">TensorFlow</span><span class="p">(</span><span class="n">entry_point</span><span class="o">=</span><span class="s1">'train.py'</span><span class="p">,</span>
+                       <span class="n">source_dir</span><span class="o">=</span><span class="s2">"train"</span><span class="p">,</span>
+                       <span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">,</span>
+                       <span class="n">instance_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                       <span class="n">instance_type</span><span class="o">=</span><span class="n">instance_type</span><span class="p">,</span>
+                       <span class="n">framework_version</span><span class="o">=</span><span class="s1">'2.1.0'</span><span class="p">,</span>
+                       <span class="n">py_version</span><span class="o">=</span><span class="s1">'py3'</span><span class="p">,</span>
+                       <span class="n">output_path</span><span class="o">=</span><span class="n">output_data_uri</span><span class="p">,</span>
+                       <span class="n">code_location</span><span class="o">=</span><span class="n">output_data_uri</span><span class="p">,</span>
+                       <span class="n">base_job_name</span><span class="o">=</span><span class="s1">'tf-transformer'</span><span class="p">,</span>
+                       <span class="n">script_mode</span><span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                       <span class="c1">#checkpoint_local_path = 'ckpt', #Use default value /opt/ml/checkpoint</span>
+                       <span class="n">checkpoint_s3_uri</span> <span class="o">=</span> <span class="n">ckpt_data_uri</span><span class="p">,</span>
+                       <span class="n">metric_definitions</span> <span class="o">=</span> <span class="n">metric_definitions</span><span class="p">,</span> 
+                       <span class="n">hyperparameters</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s1">'epochs'</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+                        <span class="s1">'nsamples'</span><span class="p">:</span> <span class="mi">60000</span><span class="p">,</span>
+                        <span class="s1">'resume'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s1">'train_file'</span><span class="p">:</span> <span class="s1">'spa.txt'</span><span class="p">,</span>
+                        <span class="s1">'non_breaking_in'</span><span class="p">:</span> <span class="s1">'nonbreaking_prefix.en'</span><span class="p">,</span>
+                        <span class="s1">'non_breaking_out'</span><span class="p">:</span> <span class="s1">'nonbreaking_prefix.es'</span>
+                       <span class="p">})</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Start-the-training-job:-fit">
+<a class="anchor" href="#Start-the-training-job:-fit" aria-hidden="true"><span class="octicon octicon-link"></span></a>Start the training job: <code>fit</code><a class="anchor-link" href="#Start-the-training-job:-fit"> </a>
+</h1>
+<p>To start a training job, we call <code>estimator.fit</code> method with the a few parameter values.</p>
+<ul>
+<li>An S3 location is used here as the input. <code>fit</code> creates a default channel named <code>'training'</code>, which points to this S3 location. In the training script we can access the training data from the local location stored in <code>SM_CHANNEL_TRAINING</code>. <code>fit</code> accepts a couple other types of input as well. See the API doc <a href="https://sagemaker.readthedocs.io/en/stable/estimators.html#sagemaker.estimator.EstimatorBase.fit">here</a> for details.</li>
+<li>
+<code>job_name</code> the name for the training job.</li>
+<li>
+<code>experiment_config</code> the dictionary with the name of the experiment and trial to attach this job to.</li>
+</ul>
+<p>When training starts, the TensorFlow container executes <code>train.py</code>, passing <code>hyperparameters</code> and <code>model_dir</code> from the estimator as script arguments. Because we didn't explicitly define it, <code>model_dir</code> defaults to <code>s3://&lt;DEFAULT_BUCKET&gt;/&lt;TRAINING_JOB_NAME&gt;/model</code>, so the script execution is as follows:</p>
+<div class="highlight"><pre><span></span>python train.py --model_dir s3://&lt;DEFAULT_BUCKET&gt;/&lt;TRAINING_JOB_NAME&gt;/model --epochs<span class="o">=</span><span class="m">1</span> --nsamples<span class="o">=</span><span class="m">5000</span> ...
+</pre></div>
+<p>When training is complete, the training job will upload the saved model and other output artifacts to S3.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the job name and show it</span>
+<span class="n">job_name</span> <span class="o">=</span> <span class="s1">'</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trial_name</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">-%H-%M-%S"</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">gmtime</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">job_name</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>tf-transformer-single-gpu-2020-11-12-12-25-30
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Calling fit to train a model with TensorFlow 2.1 scroipt.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Call the fit method to launch the training job</span>
+<span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">({</span><span class="s1">'training'</span><span class="p">:</span><span class="n">training_data_uri</span><span class="p">},</span> <span class="n">job_name</span> <span class="o">=</span> <span class="n">job_name</span><span class="p">,</span> 
+              <span class="n">experiment_config</span> <span class="o">=</span> <span class="n">experiment_config</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>INFO:sagemaker:Creating training-job with name: tf-transformer-single-gpu-2020-11-12-12-25-30
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>2020-11-12 12:25:33 Starting - Starting the training job...
+2020-11-12 12:25:39 Starting - Launching requested ML instances......
+2020-11-12 12:26:52 Starting - Preparing the instances for training.........
+2020-11-12 12:28:30 Downloading - Downloading input data
+2020-11-12 12:28:30 Training - Downloading the training image...........<span class="ansi-blue-fg">2020-11-12 12:30:19,406 sagemaker-containers INFO     Imported framework sagemaker_tensorflow_container.training</span>
+<span class="ansi-blue-fg">2020-11-12 12:30:19,885 sagemaker-containers INFO     Invoking user script
+</span>
+<span class="ansi-blue-fg">Training Env:
+</span>
+<span class="ansi-blue-fg">{
+    "additional_framework_parameters": {},
+    "channel_input_dirs": {
+        "training": "/opt/ml/input/data/training"
+    },
+    "current_host": "algo-1",
+    "framework_module": "sagemaker_tensorflow_container.training:main",
+    "hosts": [
+        "algo-1"
+    ],
+    "hyperparameters": {
+        "resume": false,
+        "non_breaking_out": "nonbreaking_prefix.es",
+        "nsamples": 60000,
+        "train_file": "spa.txt",
+        "model_dir": "s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/model",
+        "non_breaking_in": "nonbreaking_prefix.en",
+        "epochs": 8
+    },
+    "input_config_dir": "/opt/ml/input/config",
+    "input_data_config": {
+        "training": {
+            "TrainingInputMode": "File",
+            "S3DistributionType": "FullyReplicated",
+            "RecordWrapperType": "None"
+        }
+    },
+    "input_dir": "/opt/ml/input",
+    "is_master": true,
+    "job_name": "tf-transformer-single-gpu-2020-11-12-12-25-30",
+    "log_level": 20,
+    "master_hostname": "algo-1",
+    "model_dir": "/opt/ml/model",
+    "module_dir": "s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/source/sourcedir.tar.gz",
+    "module_name": "train",
+    "network_interface_name": "eth0",
+    "num_cpus": 4,
+    "num_gpus": 1,
+    "output_data_dir": "/opt/ml/output/data",
+    "output_dir": "/opt/ml/output",
+    "output_intermediate_dir": "/opt/ml/output/intermediate",
+    "resource_config": {
+        "current_host": "algo-1",
+        "hosts": [
+            "algo-1"
+        ],
+        "network_interface_name": "eth0"
+    },
+    "user_entry_point": "train.py"</span>
+<span class="ansi-blue-fg">}
+</span>
+<span class="ansi-blue-fg">Environment variables:
+</span>
+<span class="ansi-blue-fg">SM_HOSTS=["algo-1"]</span>
+<span class="ansi-blue-fg">SM_NETWORK_INTERFACE_NAME=eth0</span>
+<span class="ansi-blue-fg">SM_HPS={"epochs":8,"model_dir":"s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/model","non_breaking_in":"nonbreaking_prefix.en","non_breaking_out":"nonbreaking_prefix.es","nsamples":60000,"resume":false,"train_file":"spa.txt"}</span>
+<span class="ansi-blue-fg">SM_USER_ENTRY_POINT=train.py</span>
+<span class="ansi-blue-fg">SM_FRAMEWORK_PARAMS={}</span>
+<span class="ansi-blue-fg">SM_RESOURCE_CONFIG={"current_host":"algo-1","hosts":["algo-1"],"network_interface_name":"eth0"}</span>
+<span class="ansi-blue-fg">SM_INPUT_DATA_CONFIG={"training":{"RecordWrapperType":"None","S3DistributionType":"FullyReplicated","TrainingInputMode":"File"}}</span>
+<span class="ansi-blue-fg">SM_OUTPUT_DATA_DIR=/opt/ml/output/data</span>
+<span class="ansi-blue-fg">SM_CHANNELS=["training"]</span>
+<span class="ansi-blue-fg">SM_CURRENT_HOST=algo-1</span>
+<span class="ansi-blue-fg">SM_MODULE_NAME=train</span>
+<span class="ansi-blue-fg">SM_LOG_LEVEL=20</span>
+<span class="ansi-blue-fg">SM_FRAMEWORK_MODULE=sagemaker_tensorflow_container.training:main</span>
+<span class="ansi-blue-fg">SM_INPUT_DIR=/opt/ml/input</span>
+<span class="ansi-blue-fg">SM_INPUT_CONFIG_DIR=/opt/ml/input/config</span>
+<span class="ansi-blue-fg">SM_OUTPUT_DIR=/opt/ml/output</span>
+<span class="ansi-blue-fg">SM_NUM_CPUS=4</span>
+<span class="ansi-blue-fg">SM_NUM_GPUS=1</span>
+<span class="ansi-blue-fg">SM_MODEL_DIR=/opt/ml/model</span>
+<span class="ansi-blue-fg">SM_MODULE_DIR=s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/source/sourcedir.tar.gz</span>
+<span class="ansi-blue-fg">SM_TRAINING_ENV={"additional_framework_parameters":{},"channel_input_dirs":{"training":"/opt/ml/input/data/training"},"current_host":"algo-1","framework_module":"sagemaker_tensorflow_container.training:main","hosts":["algo-1"],"hyperparameters":{"epochs":8,"model_dir":"s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/model","non_breaking_in":"nonbreaking_prefix.en","non_breaking_out":"nonbreaking_prefix.es","nsamples":60000,"resume":false,"train_file":"spa.txt"},"input_config_dir":"/opt/ml/input/config","input_data_config":{"training":{"RecordWrapperType":"None","S3DistributionType":"FullyReplicated","TrainingInputMode":"File"}},"input_dir":"/opt/ml/input","is_master":true,"job_name":"tf-transformer-single-gpu-2020-11-12-12-25-30","log_level":20,"master_hostname":"algo-1","model_dir":"/opt/ml/model","module_dir":"s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/source/sourcedir.tar.gz","module_name":"train","network_interface_name":"eth0","num_cpus":4,"num_gpus":1,"output_data_dir":"/opt/ml/output/data","output_dir":"/opt/ml/output","output_intermediate_dir":"/opt/ml/output/intermediate","resource_config":{"current_host":"algo-1","hosts":["algo-1"],"network_interface_name":"eth0"},"user_entry_point":"train.py"}</span>
+<span class="ansi-blue-fg">SM_USER_ARGS=["--epochs","8","--model_dir","s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/model","--non_breaking_in","nonbreaking_prefix.en","--non_breaking_out","nonbreaking_prefix.es","--nsamples","60000","--resume","False","--train_file","spa.txt"]</span>
+<span class="ansi-blue-fg">SM_OUTPUT_INTERMEDIATE_DIR=/opt/ml/output/intermediate</span>
+<span class="ansi-blue-fg">SM_CHANNEL_TRAINING=/opt/ml/input/data/training</span>
+<span class="ansi-blue-fg">SM_HP_RESUME=false</span>
+<span class="ansi-blue-fg">SM_HP_NON_BREAKING_OUT=nonbreaking_prefix.es</span>
+<span class="ansi-blue-fg">SM_HP_NSAMPLES=60000</span>
+<span class="ansi-blue-fg">SM_HP_TRAIN_FILE=spa.txt</span>
+<span class="ansi-blue-fg">SM_HP_MODEL_DIR=s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/model</span>
+<span class="ansi-blue-fg">SM_HP_NON_BREAKING_IN=nonbreaking_prefix.en</span>
+<span class="ansi-blue-fg">SM_HP_EPOCHS=8</span>
+<span class="ansi-blue-fg">PYTHONPATH=/opt/ml/code:/usr/local/bin:/usr/lib/python36.zip:/usr/lib/python3.6:/usr/lib/python3.6/lib-dynload:/usr/local/lib/python3.6/dist-packages:/usr/lib/python3/dist-packages
+</span>
+<span class="ansi-blue-fg">Invoking script with the following command:
+</span>
+<span class="ansi-blue-fg">/usr/bin/python3 train.py --epochs 8 --model_dir s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/model --non_breaking_in nonbreaking_prefix.en --non_breaking_out nonbreaking_prefix.es --nsamples 60000 --resume False --train_file spa.txt
+
+</span>
+<span class="ansi-blue-fg">Collecting tensorflow_datasets
+  Downloading tensorflow_datasets-4.1.0-py3-none-any.whl (3.6 MB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: absl-py in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (0.9.0)</span>
+<span class="ansi-blue-fg">Collecting importlib-resources; python_version &lt; "3.9"
+  Downloading importlib_resources-3.3.0-py2.py3-none-any.whl (26 kB)</span>
+<span class="ansi-blue-fg">Collecting tensorflow-metadata
+  Downloading tensorflow_metadata-0.25.0-py3-none-any.whl (44 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: six in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (1.14.0)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: numpy in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (1.18.1)</span>
+<span class="ansi-blue-fg">Collecting typing-extensions; python_version &lt; "3.8"
+  Downloading typing_extensions-3.7.4.3-py3-none-any.whl (22 kB)</span>
+<span class="ansi-blue-fg">Collecting tqdm
+  Downloading tqdm-4.51.0-py2.py3-none-any.whl (70 kB)</span>
+<span class="ansi-blue-fg">Collecting dill
+  Downloading dill-0.3.3-py2.py3-none-any.whl (81 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: requests&gt;=2.19.0 in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (2.22.0)</span>
+<span class="ansi-blue-fg">Collecting promise
+  Downloading promise-2.3.tar.gz (19 kB)</span>
+<span class="ansi-blue-fg">Collecting future
+  Downloading future-0.18.2.tar.gz (829 kB)</span>
+
+2020-11-12 12:30:13 Training - Training image download completed. Training in progress.<span class="ansi-blue-fg">Requirement already satisfied: termcolor in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (1.1.0)</span>
+<span class="ansi-blue-fg">Collecting dataclasses; python_version &lt; "3.7"
+  Downloading dataclasses-0.7-py3-none-any.whl (18 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: protobuf&gt;=3.6.1 in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (3.11.3)</span>
+<span class="ansi-blue-fg">Collecting attrs&gt;=18.1.0
+  Downloading attrs-20.3.0-py2.py3-none-any.whl (49 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: zipp&gt;=0.4; python_version &lt; "3.8" in /usr/local/lib/python3.6/dist-packages (from importlib-resources; python_version &lt; "3.9"-&gt;tensorflow_datasets) (3.1.0)</span>
+<span class="ansi-blue-fg">Collecting googleapis-common-protos&lt;2,&gt;=1.52.0
+  Downloading googleapis_common_protos-1.52.0-py2.py3-none-any.whl (100 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,&lt;1.26,&gt;=1.21.1 in /usr/local/lib/python3.6/dist-packages (from requests&gt;=2.19.0-&gt;tensorflow_datasets) (1.25.9)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.6/dist-packages (from requests&gt;=2.19.0-&gt;tensorflow_datasets) (2020.4.5.1)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: chardet&lt;3.1.0,&gt;=3.0.2 in /usr/local/lib/python3.6/dist-packages (from requests&gt;=2.19.0-&gt;tensorflow_datasets) (3.0.4)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: idna&lt;2.9,&gt;=2.5 in /usr/local/lib/python3.6/dist-packages (from requests&gt;=2.19.0-&gt;tensorflow_datasets) (2.8)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: setuptools in /usr/local/lib/python3.6/dist-packages (from protobuf&gt;=3.6.1-&gt;tensorflow_datasets) (46.1.3)</span>
+<span class="ansi-blue-fg">Building wheels for collected packages: promise, future
+  Building wheel for promise (setup.py): started
+  Building wheel for promise (setup.py): finished with status 'done'
+  Created wheel for promise: filename=promise-2.3-py3-none-any.whl size=21495 sha256=5bfcc52cd449f0f077404e249a0252f083de1fc5a2950e1eede78546f1c0db75
+  Stored in directory: /root/.cache/pip/wheels/59/9a/1d/3f1afbbb5122d0410547bf9eb50955f4a7a98e53a6d8b99bd1
+  Building wheel for future (setup.py): started</span>
+<span class="ansi-blue-fg">  Building wheel for future (setup.py): finished with status 'done'
+  Created wheel for future: filename=future-0.18.2-py3-none-any.whl size=491058 sha256=3897bdb5f59ddb7663519e2e63bce2390ad30686d73d2202d0e0a5b80c16db55
+  Stored in directory: /root/.cache/pip/wheels/6e/9c/ed/4499c9865ac1002697793e0ae05ba6be33553d098f3347fb94</span>
+<span class="ansi-blue-fg">Successfully built promise future</span>
+<span class="ansi-blue-fg">Installing collected packages: importlib-resources, googleapis-common-protos, tensorflow-metadata, typing-extensions, tqdm, dill, promise, future, dataclasses, attrs, tensorflow-datasets</span>
+<span class="ansi-blue-fg">Successfully installed attrs-20.3.0 dataclasses-0.7 dill-0.3.3 future-0.18.2 googleapis-common-protos-1.52.0 importlib-resources-3.3.0 promise-2.3 tensorflow-datasets-4.1.0 tensorflow-metadata-0.25.0 tqdm-4.51.0 typing-extensions-3.7.4.3</span>
+<span class="ansi-blue-fg">WARNING: You are using pip version 20.0.2; however, version 20.2.4 is available.</span>
+<span class="ansi-blue-fg">You should consider upgrading via the '/usr/bin/python3 -m pip install --upgrade pip' command.</span>
+<span class="ansi-blue-fg">/opt/ml/model s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-12-25-30/model</span>
+<span class="ansi-blue-fg">Get the train data</span>
+<span class="ansi-blue-fg">Tokenize the input and output data and create the vocabularies</span>
+<span class="ansi-blue-fg">Input vocab:  11460</span>
+<span class="ansi-blue-fg">Output vocab:  9383</span>
+<span class="ansi-blue-fg">Creating the checkpoint ...</span>
+<span class="ansi-blue-fg">Training the model ....</span>
+<span class="ansi-blue-fg">Starting epoch 1</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 0 Loss 4.2718 Accuracy 0.0000</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 100 Loss 4.4878 Accuracy 0.0394</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 200 Loss 4.4102 Accuracy 0.0553</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 300 Loss 4.2828 Accuracy 0.0607</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 400 Loss 4.1153 Accuracy 0.0634</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 500 Loss 3.9366 Accuracy 0.0683</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 600 Loss 3.7706 Accuracy 0.0784</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 700 Loss 3.6183 Accuracy 0.0863</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 800 Loss 3.4776 Accuracy 0.0956</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 900 Loss 3.3528 Accuracy 0.1038</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 1 in /opt/ml/checkpoints/ckpt-1</span>
+<span class="ansi-blue-fg">Starting epoch 2</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 0 Loss 2.1816 Accuracy 0.1741</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 100 Loss 2.2265 Accuracy 0.1770</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 200 Loss 2.2128 Accuracy 0.1801</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 300 Loss 2.1806 Accuracy 0.1838</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 400 Loss 2.1546 Accuracy 0.1871</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 500 Loss 2.1287 Accuracy 0.1900</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 600 Loss 2.1031 Accuracy 0.1930</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 700 Loss 2.0789 Accuracy 0.1955</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 800 Loss 2.0580 Accuracy 0.1981</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 900 Loss 2.0352 Accuracy 0.2006</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 2 in /opt/ml/checkpoints/ckpt-2</span>
+<span class="ansi-blue-fg">Starting epoch 3</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 0 Loss 1.7447 Accuracy 0.2243</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 100 Loss 1.7695 Accuracy 0.2276</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 200 Loss 1.7488 Accuracy 0.2286</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 300 Loss 1.7416 Accuracy 0.2300</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 400 Loss 1.7318 Accuracy 0.2310</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 500 Loss 1.7194 Accuracy 0.2320</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 600 Loss 1.7094 Accuracy 0.2330</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 700 Loss 1.6998 Accuracy 0.2340</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 800 Loss 1.6888 Accuracy 0.2351</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 900 Loss 1.6789 Accuracy 0.2361</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 3 in /opt/ml/checkpoints/ckpt-3</span>
+<span class="ansi-blue-fg">Starting epoch 4</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 0 Loss 1.5789 Accuracy 0.2511</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 100 Loss 1.5092 Accuracy 0.2525</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 200 Loss 1.5019 Accuracy 0.2533</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 300 Loss 1.4967 Accuracy 0.2539</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 400 Loss 1.4913 Accuracy 0.2550</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 500 Loss 1.4852 Accuracy 0.2563</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 600 Loss 1.4726 Accuracy 0.2577</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 700 Loss 1.4652 Accuracy 0.2592</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 800 Loss 1.4583 Accuracy 0.2604</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 900 Loss 1.4501 Accuracy 0.2620</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 4 in /opt/ml/checkpoints/ckpt-4</span>
+<span class="ansi-blue-fg">Starting epoch 5</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 0 Loss 1.3142 Accuracy 0.2902</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 100 Loss 1.2605 Accuracy 0.2823</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 200 Loss 1.2688 Accuracy 0.2834</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 300 Loss 1.2683 Accuracy 0.2847</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 400 Loss 1.2640 Accuracy 0.2859</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 500 Loss 1.2610 Accuracy 0.2869</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 600 Loss 1.2564 Accuracy 0.2884</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 700 Loss 1.2507 Accuracy 0.2897</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 800 Loss 1.2449 Accuracy 0.2912</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 900 Loss 1.2371 Accuracy 0.2925</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 5 in /opt/ml/checkpoints/ckpt-5</span>
+<span class="ansi-blue-fg">Starting epoch 6</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 0 Loss 0.9893 Accuracy 0.3114</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 100 Loss 1.0413 Accuracy 0.3140</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 200 Loss 1.0532 Accuracy 0.3141</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 300 Loss 1.0536 Accuracy 0.3152</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 400 Loss 1.0589 Accuracy 0.3157</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 500 Loss 1.0589 Accuracy 0.3163</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 600 Loss 1.0593 Accuracy 0.3168</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 700 Loss 1.0561 Accuracy 0.3173</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 800 Loss 1.0541 Accuracy 0.3180</span>
+<span class="ansi-blue-fg">Epoch 6 Batch 900 Loss 1.0528 Accuracy 0.3186</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 6 in /opt/ml/checkpoints/ckpt-6</span>
+<span class="ansi-blue-fg">Starting epoch 7</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 0 Loss 1.0120 Accuracy 0.3504</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 100 Loss 0.9046 Accuracy 0.3345</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 200 Loss 0.9157 Accuracy 0.3350</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 300 Loss 0.9213 Accuracy 0.3342</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 400 Loss 0.9231 Accuracy 0.3343</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 500 Loss 0.9272 Accuracy 0.3341</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 600 Loss 0.9302 Accuracy 0.3342</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 700 Loss 0.9300 Accuracy 0.3343</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 800 Loss 0.9303 Accuracy 0.3346</span>
+<span class="ansi-blue-fg">Epoch 7 Batch 900 Loss 0.9315 Accuracy 0.3348</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 7 in /opt/ml/checkpoints/ckpt-7</span>
+<span class="ansi-blue-fg">Starting epoch 8</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 0 Loss 0.8039 Accuracy 0.3315</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 100 Loss 0.8109 Accuracy 0.3457</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 200 Loss 0.8154 Accuracy 0.3461</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 300 Loss 0.8282 Accuracy 0.3454</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 400 Loss 0.8360 Accuracy 0.3459</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 500 Loss 0.8395 Accuracy 0.3456</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 600 Loss 0.8426 Accuracy 0.3453</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 700 Loss 0.8456 Accuracy 0.3451</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 800 Loss 0.8459 Accuracy 0.3451</span>
+<span class="ansi-blue-fg">Epoch 8 Batch 900 Loss 0.8486 Accuracy 0.3448</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 8 in /opt/ml/checkpoints/ckpt-8</span>
+<span class="ansi-blue-fg">Saving the model ....</span>
+<span class="ansi-blue-fg">Saving the model parameters</span>
+<span class="ansi-blue-fg">Saving the dictionaries ....</span>
+<span class="ansi-blue-fg">2020-11-12 13:15:31,672 sagemaker_tensorflow_container.training WARNING  Your model will NOT be servable with SageMaker TensorFlow Serving container. The model artifact was not saved in the TensorFlow SavedModel directory structure:</span>
+<span class="ansi-blue-fg">https://www.tensorflow.org/guide/saved_model#structure_of_a_savedmodel_directory</span>
+<span class="ansi-blue-fg">2020-11-12 13:15:31,672 sagemaker-containers INFO     Reporting training SUCCESS</span>
+
+2020-11-12 13:15:47 Uploading - Uploading generated training model
+2020-11-12 13:15:55 Completed - Training job completed
+Training seconds: 2867
+Billable seconds: 2867
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Save the experiment, then you can view it and its trials from SageMaker Studio</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Save the trial</span>
+<span class="n">single_gpu_trial</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="c1"># Save the experiment</span>
+<span class="n">training_experiment</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Experiment(sagemaker_boto_client=&lt;botocore.client.SageMaker object at 0x7f3f90c75d68&gt;,experiment_name='tf-transformer',experiment_arn='arn:aws:sagemaker:us-east-1:223817798831:experiment/tf-transformer',display_name='tf-transformer',description='Experiment to track trainings on my tensorflow Transformer Eng-Spa',creation_time=datetime.datetime(2020, 11, 8, 17, 0, 49, 116000, tzinfo=tzlocal()),created_by={},last_modified_time=datetime.datetime(2020, 11, 12, 11, 50, 27, 732000, tzinfo=tzlocal()),last_modified_by={},response_metadata={'RequestId': '862d03a0-abf6-4215-a759-2ddcc4f622fd', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amzn-requestid': '862d03a0-abf6-4215-a759-2ddcc4f622fd', 'content-type': 'application/x-amz-json-1.1', 'content-length': '86', 'date': 'Thu, 12 Nov 2020 13:17:51 GMT'}, 'RetryAttempts': 0})</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Show-metrics-from-SageMaker-Console">
+<a class="anchor" href="#Show-metrics-from-SageMaker-Console" aria-hidden="true"><span class="octicon octicon-link"></span></a>Show metrics from SageMaker Console<a class="anchor-link" href="#Show-metrics-from-SageMaker-Console"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You can monitor the metrics that a training job emits in real time in the <strong>CloudWatch console</strong>:</p>
+<ul>
+<li>Open the CloudWatch console at <a href="https://console.aws.amazon.com/cloudwatch/">https://console.aws.amazon.com/cloudwatch/</a>.</li>
+<li>Choose Metrics, then choose /aws/sagemaker/TrainingJobs.</li>
+<li>Choose TrainingJobName.</li>
+<li>On the All metrics tab, choose the names of the training metrics that you want to monitor.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Another option is to monitor the metrics by using the <strong>SageMaker console</strong>.</p>
+<ul>
+<li>Open the SageMaker console at <a href="https://console.aws.amazon.com/sagemaker/">https://console.aws.amazon.com/sagemaker/</a>.</li>
+<li>Choose Training jobs, then choose the training job whose metrics you want to see.</li>
+<li>Choose TrainingJobName.</li>
+<li>In the Monitor section, you can review the graphs of instance utilization and algorithm metrics</li>
+</ul>
+<p>It is a simple way to check how your model is "learning" during the training stage.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Restore-a-training-job-and-download-the-trained-model">
+<a class="anchor" href="#Restore-a-training-job-and-download-the-trained-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Restore a training job and download the trained model<a class="anchor-link" href="#Restore-a-training-job-and-download-the-trained-model"> </a>
+</h1>
+<p>At this point, we have a trained model stored in S3. But we are interested in making some predictions with it.</p>
+<p>After you train your model, you can deploy it using Amazon SageMaker to get predictions in any of the following ways:</p>
+<ul>
+<li>To set up a persistent endpoint to get one prediction at a time, use SageMaker hosting services.</li>
+<li>To get predictions for an entire dataset, use SageMaker batch transform.</li>
+</ul>
+<p>But in this notebook we do not cover this feature because sometimes we are more interested in reloading our model in a new notebook to apply an evaluation method or study its parameters or gradients. So, here we are going to download the model artifacts from S3 and load them to an "empty" model instance.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Attach-a-previous-training-job">
+<a class="anchor" href="#Attach-a-previous-training-job" aria-hidden="true"><span class="octicon octicon-link"></span></a>Attach a previous training job<a class="anchor-link" href="#Attach-a-previous-training-job"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If we have just trained a model using our estimator variable in this notebook execution, we can skip this step. But probably you trained your model for hours and now you need to restore your estimator variable from a previous training job. Check for the training job you want to restore the model in SageMaker console, copy the name and paste it in the next section of code. And then you call the <code>attach</code> method of the estimator object and now you can continue to work with our training job.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can skip the next cell if the previous estimator.fit command was executed</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sagemaker.tensorflow</span> <span class="kn">import</span> <span class="n">TensorFlow</span>
+
+<span class="c1"># Set the training job you want to attach to the estimator object</span>
+<span class="c1"># Use this option if the training job was not trained in this execution</span>
+<span class="n">my_training_job_name</span> <span class="o">=</span> <span class="s1">'tf-transformer-single-gpu-2020-11-12-18-36-15'</span>
+
+<span class="c1"># In case, when the training job have been trained in this execution, we can retrive the data from the job_name variable</span>
+<span class="c1">#my_training_job_name = job_name</span>
+<span class="c1"># Attach the estimator to the selected training job</span>
+<span class="n">estimator</span> <span class="o">=</span> <span class="n">TensorFlow</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">my_training_job_name</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+2020-11-12 19:13:13 Starting - Preparing the instances for training
+2020-11-12 19:13:13 Downloading - Downloading input data
+2020-11-12 19:13:13 Training - Training image download completed. Training in progress.
+2020-11-12 19:13:13 Uploading - Uploading generated training model
+2020-11-12 19:13:13 Completed - Training job completed
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the job_name</span>
+<span class="n">job_name</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">latest_training_job</span><span class="o">.</span><span class="n">job_name</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Job name where the model will be restored: '</span><span class="p">,</span><span class="n">estimator</span><span class="o">.</span><span class="n">latest_training_job</span><span class="o">.</span><span class="n">job_name</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Job name where the model will be restored:  tf-transformer-single-gpu-2020-11-12-18-36-15
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'Dir of model data: '</span><span class="p">,</span><span class="n">estimator</span><span class="o">.</span><span class="n">model_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Dir of output data: '</span><span class="p">,</span><span class="n">output_data_uri</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Buck name: '</span><span class="p">,</span><span class="n">bucket_name</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Dir of model data:  s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/output/model.tar.gz
+Dir of output data:  s3://edumunozsala-ml-sagemaker/transformer-nmt
+Buck name:  edumunozsala-ml-sagemaker
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Download-the-trained-model">
+<a class="anchor" href="#Download-the-trained-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download the trained model<a class="anchor-link" href="#Download-the-trained-model"> </a>
+</h2>
+<p>The estimator object variable <code>model_data</code> points to the <code>model.tar.gz</code> file which contains the saved model. And the other output files from our model that we need to rebuild and tokenize or detokenize the sentences can be found in the S3 folder <code>output_path/output/output.tar.gz</code>. We can download both files and unzip them.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the model and the output path in S3 to download the data </span>
+<span class="n">init_model_path</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="s1">'s3://'</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">bucket_name</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">s3_model_path</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">model_data</span><span class="p">[</span><span class="n">init_model_path</span><span class="p">:]</span>
+<span class="n">s3_output_data</span><span class="o">=</span><span class="n">output_data_uri</span><span class="p">[</span><span class="n">init_model_path</span><span class="p">:]</span><span class="o">+</span><span class="s1">'/</span><span class="si">{}</span><span class="s1">/output/output.tar.gz'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">job_name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Dir to download traned model: '</span><span class="p">,</span> <span class="n">s3_model_path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Dir to download model outputs: '</span><span class="p">,</span> <span class="n">s3_output_data</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Dir to download traned model:  transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/output/model.tar.gz
+Dir to download model outputs:  transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/output/output.tar.gz
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sagemaker_session</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">trainedmodel_path</span><span class="p">,</span><span class="n">bucket_name</span><span class="p">,</span><span class="n">s3_model_path</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sagemaker_session</span><span class="o">.</span><span class="n">download_data</span><span class="p">(</span><span class="n">output_data_path</span><span class="p">,</span><span class="n">bucket_name</span><span class="p">,</span><span class="n">s3_output_data</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, extract the information out from the model.tar.gz file return by the training job in SageMaker:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>tar -zxvf <span class="nv">$trainedmodel_path</span>/model.tar.gz
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>transformer.data-00000-of-00002
+transformer.index
+transformer.data-00001-of-00002
+checkpoint
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Extract the files from output.tar.gz without recreating the directory structure, all files will be extracted to the working directory</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>tar -xvzf <span class="nv">$output_data_path</span>/output.tar.gz #--strip-components<span class="o">=</span><span class="m">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>out_vocab.pkl
+model_info.pth
+in_vocab.pkl
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Import-the-tensorflow-model-and-load-the-model">
+<a class="anchor" href="#Import-the-tensorflow-model-and-load-the-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Import the tensorflow model and load the model<a class="anchor-link" href="#Import-the-tensorflow-model-and-load-the-model"> </a>
+</h3>
+<p>We import the <code>model.py</code> file with our model definition but we only have the weights of the model, so we need to rebuild it. The model parameters where saved during training in the <code>model_info.pth</code>, we just need to read that file and use the parameters to initiate an empty instance of the model. And then we can load the weights, <code>load_weights()</code> into that instance.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">train.model</span> <span class="kn">import</span> <span class="n">Transformer</span>
+
+<span class="c1"># Read the parameters from a dictionary</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_info_file</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">model_info</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Model parameters'</span><span class="p">,</span><span class="n">model_info</span><span class="p">)</span>
+
+<span class="c1">#Create an instance of the Transforer model and load the saved model to th</span>
+<span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="p">(</span><span class="n">vocab_size_enc</span><span class="o">=</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'vocab_size_enc'</span><span class="p">],</span>
+                          <span class="n">vocab_size_dec</span><span class="o">=</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'vocab_size_dec'</span><span class="p">],</span>
+                          <span class="n">d_model</span><span class="o">=</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'d_model'</span><span class="p">],</span>
+                          <span class="n">n_layers</span><span class="o">=</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'n_layers'</span><span class="p">],</span>
+                          <span class="n">FFN_units</span><span class="o">=</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'ffn_dim'</span><span class="p">],</span>
+                          <span class="n">n_heads</span><span class="o">=</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'n_heads'</span><span class="p">],</span>
+                          <span class="n">dropout_rate</span><span class="o">=</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'drop_rate'</span><span class="p">])</span>
+
+<span class="c1">#Load the saved model</span>
+<span class="c1"># To do: Use variable to store the model name and pass it in as a hyperparameter of the estimator</span>
+<span class="n">transformer</span><span class="o">.</span><span class="n">load_weights</span><span class="p">(</span><span class="s1">'transformer'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Model parameters {'vocab_size_enc': 11460, 'vocab_size_dec': 9383, 'sos_token_input': [11458], 'eos_token_input': [11459], 'sos_token_output': [9381], 'eos_token_output': [9382], 'n_layers': 4, 'd_model': 64, 'ffn_dim': 128, 'n_heads': 8, 'drop_rate': 0.1}
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;tensorflow.python.training.tracking.util.CheckpointLoadStatus at 0x7f00f7b045f8&gt;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Make-some-predictions">
+<a class="anchor" href="#Make-some-predictions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Make some predictions<a class="anchor-link" href="#Make-some-predictions"> </a>
+</h1>
+<p>And now everything is ready to make prediction with our trained model:</p>
+<ul>
+<li>Import the <code>predict.py</code> file with the functions to make a prediction and to translate a sentence. The code was described in the original post.</li>
+<li>Read the files and load the tokenizer for the input and output sentences</li>
+<li>Call to <code>traslate</code> function with the model, the tokenizers, the <code>sos</code>and <code>eos</code> tokens, the sentence to translate and the max length of the output. It returns the predicted sentence detokenize, a plain text, with the translation. </li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Install the library necessary to tokenize the sentences</span>
+<span class="o">!</span>pip install tensorflow-datasets
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Collecting tensorflow-datasets
+  Downloading tensorflow_datasets-4.1.0-py3-none-any.whl (3.6 MB)
+     |████████████████████████████████| 3.6 MB 13.8 MB/s eta 0:00:01
+Requirement already satisfied: tqdm in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (4.42.1)
+Collecting dataclasses; python_version &lt; "3.7"
+  Downloading dataclasses-0.8-py3-none-any.whl (19 kB)
+Collecting importlib-resources; python_version &lt; "3.9"
+  Downloading importlib_resources-3.3.0-py2.py3-none-any.whl (26 kB)
+Requirement already satisfied: attrs&gt;=18.1.0 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (19.3.0)
+Requirement already satisfied: protobuf&gt;=3.6.1 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (3.8.0)
+Collecting tensorflow-metadata
+  Downloading tensorflow_metadata-0.25.0-py3-none-any.whl (44 kB)
+     |████████████████████████████████| 44 kB 5.6 MB/s  eta 0:00:01
+Requirement already satisfied: termcolor in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (1.1.0)
+Requirement already satisfied: absl-py in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (0.11.0)
+Collecting promise
+  Downloading promise-2.3.tar.gz (19 kB)
+Collecting dill
+  Downloading dill-0.3.3-py2.py3-none-any.whl (81 kB)
+     |████████████████████████████████| 81 kB 17.5 MB/s eta 0:00:01
+Requirement already satisfied: future in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (0.18.2)
+Requirement already satisfied: numpy in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (1.18.1)
+Requirement already satisfied: requests&gt;=2.19.0 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (2.22.0)
+Requirement already satisfied: six in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from tensorflow-datasets) (1.14.0)
+Collecting typing-extensions; python_version &lt; "3.8"
+  Downloading typing_extensions-3.7.4.3-py3-none-any.whl (22 kB)
+Requirement already satisfied: zipp&gt;=0.4; python_version &lt; "3.8" in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from importlib-resources; python_version &lt; "3.9"-&gt;tensorflow-datasets) (2.2.0)
+Requirement already satisfied: setuptools in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from protobuf&gt;=3.6.1-&gt;tensorflow-datasets) (45.2.0.post20200210)
+Collecting googleapis-common-protos&lt;2,&gt;=1.52.0
+  Downloading googleapis_common_protos-1.52.0-py2.py3-none-any.whl (100 kB)
+     |████████████████████████████████| 100 kB 18.2 MB/s ta 0:00:01
+Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,&lt;1.26,&gt;=1.21.1 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from requests&gt;=2.19.0-&gt;tensorflow-datasets) (1.25.10)
+Requirement already satisfied: idna&lt;2.9,&gt;=2.5 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from requests&gt;=2.19.0-&gt;tensorflow-datasets) (2.8)
+Requirement already satisfied: chardet&lt;3.1.0,&gt;=3.0.2 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from requests&gt;=2.19.0-&gt;tensorflow-datasets) (3.0.4)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /home/ec2-user/anaconda3/envs/tensorflow2_p36/lib/python3.6/site-packages (from requests&gt;=2.19.0-&gt;tensorflow-datasets) (2020.6.20)
+Building wheels for collected packages: promise
+  Building wheel for promise (setup.py) ... done
+  Created wheel for promise: filename=promise-2.3-py3-none-any.whl size=21495 sha256=1eeea3a689d00d6a15f97c89d4bd92ce7c63d62bbca77357f5aa7be67b44d3af
+  Stored in directory: /home/ec2-user/.cache/pip/wheels/59/9a/1d/3f1afbbb5122d0410547bf9eb50955f4a7a98e53a6d8b99bd1
+Successfully built promise
+<span class="ansi-red-fg">ERROR: tensorflow-metadata 0.25.0 has requirement absl-py&lt;0.11,&gt;=0.9, but you'll have absl-py 0.11.0 which is incompatible.</span>
+Installing collected packages: dataclasses, importlib-resources, googleapis-common-protos, tensorflow-metadata, promise, dill, typing-extensions, tensorflow-datasets
+Successfully installed dataclasses-0.8 dill-0.3.3 googleapis-common-protos-1.52.0 importlib-resources-3.3.0 promise-2.3 tensorflow-datasets-4.1.0 tensorflow-metadata-0.25.0 typing-extensions-3.7.4.3
+<span class="ansi-yellow-fg">WARNING: You are using pip version 20.0.2; however, version 20.2.4 is available.
+You should consider upgrading via the '/home/ec2-user/anaconda3/envs/tensorflow2_p36/bin/python -m pip install --upgrade pip' command.</span>
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">serve.predict</span> <span class="kn">import</span> <span class="n">translate</span>
+<span class="kn">import</span> <span class="nn">tensorflow_datasets</span> <span class="k">as</span> <span class="nn">tfds</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Load the input and output tokenizer or vocabularis used in the training. We need them to encode and decode the sentences</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Read the parameters from a dictionary</span>
+<span class="c1">#model_info_path = os.path.join(model_dir, 'model_info.pth')</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_vocab_file</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">tokenizer_inputs</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_vocab_file</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">tokenizer_outputs</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Show some translations</span>
+<span class="n">sentence</span> <span class="o">=</span> <span class="s2">"you should pay for it."</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Input sentence: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sentence</span><span class="p">))</span>
+<span class="n">predicted_sentence</span> <span class="o">=</span> <span class="n">translate</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span><span class="n">sentence</span><span class="p">,</span><span class="n">tokenizer_inputs</span><span class="p">,</span> <span class="n">tokenizer_outputs</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'sos_token_input'</span><span class="p">],</span>
+                               <span class="n">model_info</span><span class="p">[</span><span class="s1">'eos_token_input'</span><span class="p">],</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'sos_token_output'</span><span class="p">],</span>
+                               <span class="n">model_info</span><span class="p">[</span><span class="s1">'eos_token_output'</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Output sentence: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">predicted_sentence</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Input sentence: you should pay for it.
+Output sentence: Deberías pagar por ello.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Show some translations</span>
+<span class="n">sentence</span> <span class="o">=</span> <span class="s2">"This is a really powerful method!"</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Input sentence: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sentence</span><span class="p">))</span>
+<span class="n">predicted_sentence</span> <span class="o">=</span> <span class="n">translate</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span><span class="n">sentence</span><span class="p">,</span><span class="n">tokenizer_inputs</span><span class="p">,</span> <span class="n">tokenizer_outputs</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'sos_token_input'</span><span class="p">],</span>
+                               <span class="n">model_info</span><span class="p">[</span><span class="s1">'eos_token_input'</span><span class="p">],</span><span class="n">model_info</span><span class="p">[</span><span class="s1">'sos_token_output'</span><span class="p">],</span>
+                               <span class="n">model_info</span><span class="p">[</span><span class="s1">'eos_token_output'</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Output sentence: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">predicted_sentence</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Input sentence: This is a really powerful method!
+Output sentence: ¡Esto es un montón de las carreras de las ocho!
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Resume-training-from-a-checkpoint">
+<a class="anchor" href="#Resume-training-from-a-checkpoint" aria-hidden="true"><span class="octicon octicon-link"></span></a>Resume training from a checkpoint<a class="anchor-link" href="#Resume-training-from-a-checkpoint"> </a>
+</h1>
+<p>Sometimes we need to stop our training, and maybe do some research in the performance or reallocate more resources to continue with the project. But when it is done, we need to resume the training, restoring the model and the optimizer states and continue for some more epochs to achieve a final trained model with a better performance.</p>
+<p>To help with that scenario, the <code>checkpoint_local_path</code>and <code>checkpoint_s3_uri</code> estimator parameters are much relevant. The first one is the local path, inside the container, that the algorithm writes its checkpoints to. SageMaker will persist all files under this path to <code>checkpoint_s3_uri</code> continually during training. On job startup the reverse happens - data from the s3 location is downloaded to this path before the algorithm is started. If the path is unset then SageMaker assumes the checkpoints will be provided under <code>/opt/ml/checkpoints/</code>. Using this feature we can resume training from the last checkpoint (or a previous one).</p>
+<p>For this purpose, we set the model parameter <code>resume = True</code> and <code>fit</code> the estimator to execute another training.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Load the experiment and trial created in a previous run or create a new one:</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the experiment name</span>
+<span class="n">experiment_name</span><span class="o">=</span><span class="s1">'tf-transformer'</span>
+<span class="c1"># Set the trial name </span>
+<span class="n">trial_name</span><span class="o">=</span><span class="s2">"</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">experiment_name</span><span class="p">,</span><span class="s1">'single-gpu'</span><span class="p">)</span>
+<span class="n">trial_comp_name</span> <span class="o">=</span> <span class="s1">'single-gpu-training-job'</span>
+
+<span class="n">tags</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">'Key'</span><span class="p">:</span> <span class="s1">'my-experiments'</span><span class="p">,</span> <span class="s1">'Value'</span><span class="p">:</span> <span class="s1">'transformerEngSpa1'</span><span class="p">}]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># create the experiment if it doesn't exist</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Load the experiment'</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"ResourceNotFound"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+        <span class="n">experiment</span> <span class="o">=</span> <span class="n">Experiment</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Create the experiment'</span><span class="p">)</span>
+
+
+<span class="c1"># create the trial if it doesn't exist</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">trial</span> <span class="o">=</span> <span class="n">Trial</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">trial_name</span><span class="o">=</span><span class="n">trial_name</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Load the trial'</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"ResourceNotFound"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+        <span class="n">trial</span> <span class="o">=</span> <span class="n">Trial</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">,</span> <span class="n">trial_name</span><span class="o">=</span><span class="n">trial_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'Create the trial'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Load the experiment
+Load the trial
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the configuration parameters for the experiment</span>
+<span class="n">experiment_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'ExperimentName'</span><span class="p">:</span> <span class="n">experiment</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">,</span> 
+                       <span class="s1">'TrialName'</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">trial_name</span><span class="p">,</span>
+                       <span class="s1">'TrialComponentDisplayName'</span><span class="p">:</span> <span class="n">trial_comp_name</span><span class="p">}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Create an Estimator for a TensorFlow 2.1 model and set the parameter <code>--resume</code> to True to force the model to restore the latest checkpoint and resume training for the number of epochs selected</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#instance_type='ml.m5.xlarge'</span>
+<span class="c1">#instance_type='ml.m4.4xlarge'</span>
+<span class="n">instance_type</span><span class="o">=</span><span class="s1">'ml.p2.xlarge'</span>
+<span class="c1">#instance_type='local'</span>
+
+<span class="c1"># Define the metrics to search for</span>
+<span class="n">metric_definitions</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">'Name'</span><span class="p">:</span> <span class="s1">'loss'</span><span class="p">,</span> <span class="s1">'Regex'</span><span class="p">:</span> <span class="s1">'Loss ([0-9</span><span class="se">\\</span><span class="s1">.]+)'</span><span class="p">},{</span><span class="s1">'Name'</span><span class="p">:</span> <span class="s1">'Accuracy'</span><span class="p">,</span> <span class="s1">'Regex'</span><span class="p">:</span> <span class="s1">'Accuracy ([0-9</span><span class="se">\\</span><span class="s1">.]+)'</span><span class="p">}]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create an estimator with the hyperparameter resume = True</span>
+<span class="n">estimator</span> <span class="o">=</span> <span class="n">TensorFlow</span><span class="p">(</span><span class="n">entry_point</span><span class="o">=</span><span class="s1">'train.py'</span><span class="p">,</span>
+                       <span class="n">source_dir</span><span class="o">=</span><span class="s1">'train'</span><span class="p">,</span>
+                       <span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">,</span>
+                       <span class="n">instance_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                       <span class="n">instance_type</span><span class="o">=</span><span class="n">instance_type</span><span class="p">,</span>
+                       <span class="n">framework_version</span><span class="o">=</span><span class="s1">'2.1.0'</span><span class="p">,</span>
+                       <span class="n">py_version</span><span class="o">=</span><span class="s1">'py3'</span><span class="p">,</span>
+                       <span class="n">output_path</span><span class="o">=</span><span class="n">output_data_uri</span><span class="p">,</span>
+                       <span class="n">code_location</span><span class="o">=</span><span class="n">output_data_uri</span><span class="p">,</span>
+                       <span class="n">base_job_name</span><span class="o">=</span><span class="s1">'tf-transformer'</span><span class="p">,</span>
+                       <span class="n">script_mode</span><span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                       <span class="n">checkpoint_s3_uri</span> <span class="o">=</span> <span class="n">ckpt_data_uri</span><span class="p">,</span>
+                       <span class="n">metric_definitions</span> <span class="o">=</span> <span class="n">metric_definitions</span><span class="p">,</span> 
+                       <span class="n">hyperparameters</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s1">'epochs'</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                        <span class="s1">'nsamples'</span><span class="p">:</span> <span class="mi">60000</span><span class="p">,</span>
+                        <span class="s1">'resume'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s1">'train_file'</span><span class="p">:</span> <span class="s1">'spa.txt'</span><span class="p">,</span>
+                        <span class="s1">'non_breaking_in'</span><span class="p">:</span> <span class="s1">'nonbreaking_prefix.en'</span><span class="p">,</span>
+                        <span class="s1">'non_breaking_out'</span><span class="p">:</span> <span class="s1">'nonbreaking_prefix.es'</span>
+                       <span class="p">})</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the job name and show it</span>
+<span class="n">job_name</span> <span class="o">=</span> <span class="s1">'</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trial_name</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">-%H-%M-%S"</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">gmtime</span><span class="p">()))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">job_name</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>tf-transformer-single-gpu-2020-11-12-18-36-15
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Fit or train the model from the latest checkpoint</span>
+<span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">({</span><span class="s1">'training'</span><span class="p">:</span><span class="n">training_data_uri</span><span class="p">},</span> <span class="n">job_name</span> <span class="o">=</span> <span class="n">job_name</span><span class="p">,</span> 
+              <span class="n">experiment_config</span> <span class="o">=</span> <span class="n">experiment_config</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>INFO:sagemaker:Creating training-job with name: tf-transformer-single-gpu-2020-11-12-18-36-15
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>2020-11-12 18:36:34 Starting - Starting the training job...
+2020-11-12 18:36:39 Starting - Launching requested ML instances......
+2020-11-12 18:37:59 Starting - Preparing the instances for training.........
+2020-11-12 18:39:13 Downloading - Downloading input data......
+2020-11-12 18:40:24 Training - Downloading the training image......
+2020-11-12 18:41:37 Training - Training image download completed. Training in progress...<span class="ansi-blue-fg">2020-11-12 18:41:43,057 sagemaker-containers INFO     Imported framework sagemaker_tensorflow_container.training</span>
+<span class="ansi-blue-fg">2020-11-12 18:41:43,563 sagemaker-containers INFO     Invoking user script
+</span>
+<span class="ansi-blue-fg">Training Env:
+</span>
+<span class="ansi-blue-fg">{
+    "additional_framework_parameters": {},
+    "channel_input_dirs": {
+        "training": "/opt/ml/input/data/training"
+    },
+    "current_host": "algo-1",
+    "framework_module": "sagemaker_tensorflow_container.training:main",
+    "hosts": [
+        "algo-1"
+    ],
+    "hyperparameters": {
+        "resume": true,
+        "non_breaking_out": "nonbreaking_prefix.es",
+        "nsamples": 60000,
+        "train_file": "spa.txt",
+        "model_dir": "s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/model",
+        "non_breaking_in": "nonbreaking_prefix.en",
+        "epochs": 5
+    },
+    "input_config_dir": "/opt/ml/input/config",
+    "input_data_config": {
+        "training": {
+            "TrainingInputMode": "File",
+            "S3DistributionType": "FullyReplicated",
+            "RecordWrapperType": "None"
+        }
+    },
+    "input_dir": "/opt/ml/input",
+    "is_master": true,
+    "job_name": "tf-transformer-single-gpu-2020-11-12-18-36-15",
+    "log_level": 20,
+    "master_hostname": "algo-1",
+    "model_dir": "/opt/ml/model",
+    "module_dir": "s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/source/sourcedir.tar.gz",
+    "module_name": "train",
+    "network_interface_name": "eth0",
+    "num_cpus": 4,
+    "num_gpus": 1,
+    "output_data_dir": "/opt/ml/output/data",
+    "output_dir": "/opt/ml/output",
+    "output_intermediate_dir": "/opt/ml/output/intermediate",
+    "resource_config": {
+        "current_host": "algo-1",
+        "hosts": [
+            "algo-1"
+        ],
+        "network_interface_name": "eth0"
+    },
+    "user_entry_point": "train.py"</span>
+<span class="ansi-blue-fg">}
+</span>
+<span class="ansi-blue-fg">Environment variables:
+</span>
+<span class="ansi-blue-fg">SM_HOSTS=["algo-1"]</span>
+<span class="ansi-blue-fg">SM_NETWORK_INTERFACE_NAME=eth0</span>
+<span class="ansi-blue-fg">SM_HPS={"epochs":5,"model_dir":"s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/model","non_breaking_in":"nonbreaking_prefix.en","non_breaking_out":"nonbreaking_prefix.es","nsamples":60000,"resume":true,"train_file":"spa.txt"}</span>
+<span class="ansi-blue-fg">SM_USER_ENTRY_POINT=train.py</span>
+<span class="ansi-blue-fg">SM_FRAMEWORK_PARAMS={}</span>
+<span class="ansi-blue-fg">SM_RESOURCE_CONFIG={"current_host":"algo-1","hosts":["algo-1"],"network_interface_name":"eth0"}</span>
+<span class="ansi-blue-fg">SM_INPUT_DATA_CONFIG={"training":{"RecordWrapperType":"None","S3DistributionType":"FullyReplicated","TrainingInputMode":"File"}}</span>
+<span class="ansi-blue-fg">SM_OUTPUT_DATA_DIR=/opt/ml/output/data</span>
+<span class="ansi-blue-fg">SM_CHANNELS=["training"]</span>
+<span class="ansi-blue-fg">SM_CURRENT_HOST=algo-1</span>
+<span class="ansi-blue-fg">SM_MODULE_NAME=train</span>
+<span class="ansi-blue-fg">SM_LOG_LEVEL=20</span>
+<span class="ansi-blue-fg">SM_FRAMEWORK_MODULE=sagemaker_tensorflow_container.training:main</span>
+<span class="ansi-blue-fg">SM_INPUT_DIR=/opt/ml/input</span>
+<span class="ansi-blue-fg">SM_INPUT_CONFIG_DIR=/opt/ml/input/config</span>
+<span class="ansi-blue-fg">SM_OUTPUT_DIR=/opt/ml/output</span>
+<span class="ansi-blue-fg">SM_NUM_CPUS=4</span>
+<span class="ansi-blue-fg">SM_NUM_GPUS=1</span>
+<span class="ansi-blue-fg">SM_MODEL_DIR=/opt/ml/model</span>
+<span class="ansi-blue-fg">SM_MODULE_DIR=s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/source/sourcedir.tar.gz</span>
+<span class="ansi-blue-fg">SM_TRAINING_ENV={"additional_framework_parameters":{},"channel_input_dirs":{"training":"/opt/ml/input/data/training"},"current_host":"algo-1","framework_module":"sagemaker_tensorflow_container.training:main","hosts":["algo-1"],"hyperparameters":{"epochs":5,"model_dir":"s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/model","non_breaking_in":"nonbreaking_prefix.en","non_breaking_out":"nonbreaking_prefix.es","nsamples":60000,"resume":true,"train_file":"spa.txt"},"input_config_dir":"/opt/ml/input/config","input_data_config":{"training":{"RecordWrapperType":"None","S3DistributionType":"FullyReplicated","TrainingInputMode":"File"}},"input_dir":"/opt/ml/input","is_master":true,"job_name":"tf-transformer-single-gpu-2020-11-12-18-36-15","log_level":20,"master_hostname":"algo-1","model_dir":"/opt/ml/model","module_dir":"s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/source/sourcedir.tar.gz","module_name":"train","network_interface_name":"eth0","num_cpus":4,"num_gpus":1,"output_data_dir":"/opt/ml/output/data","output_dir":"/opt/ml/output","output_intermediate_dir":"/opt/ml/output/intermediate","resource_config":{"current_host":"algo-1","hosts":["algo-1"],"network_interface_name":"eth0"},"user_entry_point":"train.py"}</span>
+<span class="ansi-blue-fg">SM_USER_ARGS=["--epochs","5","--model_dir","s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/model","--non_breaking_in","nonbreaking_prefix.en","--non_breaking_out","nonbreaking_prefix.es","--nsamples","60000","--resume","True","--train_file","spa.txt"]</span>
+<span class="ansi-blue-fg">SM_OUTPUT_INTERMEDIATE_DIR=/opt/ml/output/intermediate</span>
+<span class="ansi-blue-fg">SM_CHANNEL_TRAINING=/opt/ml/input/data/training</span>
+<span class="ansi-blue-fg">SM_HP_RESUME=true</span>
+<span class="ansi-blue-fg">SM_HP_NON_BREAKING_OUT=nonbreaking_prefix.es</span>
+<span class="ansi-blue-fg">SM_HP_NSAMPLES=60000</span>
+<span class="ansi-blue-fg">SM_HP_TRAIN_FILE=spa.txt</span>
+<span class="ansi-blue-fg">SM_HP_MODEL_DIR=s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/model</span>
+<span class="ansi-blue-fg">SM_HP_NON_BREAKING_IN=nonbreaking_prefix.en</span>
+<span class="ansi-blue-fg">SM_HP_EPOCHS=5</span>
+<span class="ansi-blue-fg">PYTHONPATH=/opt/ml/code:/usr/local/bin:/usr/lib/python36.zip:/usr/lib/python3.6:/usr/lib/python3.6/lib-dynload:/usr/local/lib/python3.6/dist-packages:/usr/lib/python3/dist-packages
+</span>
+<span class="ansi-blue-fg">Invoking script with the following command:
+</span>
+<span class="ansi-blue-fg">/usr/bin/python3 train.py --epochs 5 --model_dir s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/model --non_breaking_in nonbreaking_prefix.en --non_breaking_out nonbreaking_prefix.es --nsamples 60000 --resume True --train_file spa.txt
+
+</span>
+<span class="ansi-blue-fg">Collecting tensorflow_datasets
+  Downloading tensorflow_datasets-4.1.0-py3-none-any.whl (3.6 MB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: termcolor in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (1.1.0)</span>
+<span class="ansi-blue-fg">Collecting future
+  Downloading future-0.18.2.tar.gz (829 kB)</span>
+<span class="ansi-blue-fg">Collecting dill
+  Downloading dill-0.3.3-py2.py3-none-any.whl (81 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: numpy in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (1.18.1)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: requests&gt;=2.19.0 in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (2.22.0)</span>
+<span class="ansi-blue-fg">Collecting tensorflow-metadata
+  Downloading tensorflow_metadata-0.25.0-py3-none-any.whl (44 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: six in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (1.14.0)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: protobuf&gt;=3.6.1 in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (3.11.3)</span>
+<span class="ansi-blue-fg">Collecting attrs&gt;=18.1.0
+  Downloading attrs-20.3.0-py2.py3-none-any.whl (49 kB)</span>
+<span class="ansi-blue-fg">Collecting tqdm
+  Downloading tqdm-4.51.0-py2.py3-none-any.whl (70 kB)</span>
+<span class="ansi-blue-fg">Collecting importlib-resources; python_version &lt; "3.9"
+  Downloading importlib_resources-3.3.0-py2.py3-none-any.whl (26 kB)</span>
+<span class="ansi-blue-fg">Collecting typing-extensions; python_version &lt; "3.8"
+  Downloading typing_extensions-3.7.4.3-py3-none-any.whl (22 kB)</span>
+<span class="ansi-blue-fg">Collecting promise
+  Downloading promise-2.3.tar.gz (19 kB)</span>
+<span class="ansi-blue-fg">Collecting dataclasses; python_version &lt; "3.7"
+  Downloading dataclasses-0.7-py3-none-any.whl (18 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: absl-py in /usr/local/lib/python3.6/dist-packages (from tensorflow_datasets) (0.9.0)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.6/dist-packages (from requests&gt;=2.19.0-&gt;tensorflow_datasets) (2020.4.5.1)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,&lt;1.26,&gt;=1.21.1 in /usr/local/lib/python3.6/dist-packages (from requests&gt;=2.19.0-&gt;tensorflow_datasets) (1.25.9)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: chardet&lt;3.1.0,&gt;=3.0.2 in /usr/local/lib/python3.6/dist-packages (from requests&gt;=2.19.0-&gt;tensorflow_datasets) (3.0.4)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: idna&lt;2.9,&gt;=2.5 in /usr/local/lib/python3.6/dist-packages (from requests&gt;=2.19.0-&gt;tensorflow_datasets) (2.8)</span>
+<span class="ansi-blue-fg">Collecting googleapis-common-protos&lt;2,&gt;=1.52.0
+  Downloading googleapis_common_protos-1.52.0-py2.py3-none-any.whl (100 kB)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: setuptools in /usr/local/lib/python3.6/dist-packages (from protobuf&gt;=3.6.1-&gt;tensorflow_datasets) (46.1.3)</span>
+<span class="ansi-blue-fg">Requirement already satisfied: zipp&gt;=0.4; python_version &lt; "3.8" in /usr/local/lib/python3.6/dist-packages (from importlib-resources; python_version &lt; "3.9"-&gt;tensorflow_datasets) (3.1.0)</span>
+<span class="ansi-blue-fg">Building wheels for collected packages: future, promise
+  Building wheel for future (setup.py): started</span>
+<span class="ansi-blue-fg">  Building wheel for future (setup.py): finished with status 'done'
+  Created wheel for future: filename=future-0.18.2-py3-none-any.whl size=491058 sha256=8ee2ee7f64812eaeae88dab477913a1a102478229062751714d6baea811887ea
+  Stored in directory: /root/.cache/pip/wheels/6e/9c/ed/4499c9865ac1002697793e0ae05ba6be33553d098f3347fb94
+  Building wheel for promise (setup.py): started</span>
+<span class="ansi-blue-fg">  Building wheel for promise (setup.py): finished with status 'done'
+  Created wheel for promise: filename=promise-2.3-py3-none-any.whl size=21495 sha256=6a50141ea6170764a8fea8f42c9875da12c21f0528a4b72678a6a683e10860ce
+  Stored in directory: /root/.cache/pip/wheels/59/9a/1d/3f1afbbb5122d0410547bf9eb50955f4a7a98e53a6d8b99bd1</span>
+<span class="ansi-blue-fg">Successfully built future promise</span>
+<span class="ansi-blue-fg">Installing collected packages: future, dill, googleapis-common-protos, tensorflow-metadata, attrs, tqdm, importlib-resources, typing-extensions, promise, dataclasses, tensorflow-datasets</span>
+<span class="ansi-blue-fg">Successfully installed attrs-20.3.0 dataclasses-0.7 dill-0.3.3 future-0.18.2 googleapis-common-protos-1.52.0 importlib-resources-3.3.0 promise-2.3 tensorflow-datasets-4.1.0 tensorflow-metadata-0.25.0 tqdm-4.51.0 typing-extensions-3.7.4.3</span>
+<span class="ansi-blue-fg">WARNING: You are using pip version 20.0.2; however, version 20.2.4 is available.</span>
+<span class="ansi-blue-fg">You should consider upgrading via the '/usr/bin/python3 -m pip install --upgrade pip' command.</span>
+<span class="ansi-blue-fg">/opt/ml/model s3://edumunozsala-ml-sagemaker/transformer-nmt/tf-transformer-single-gpu-2020-11-12-18-36-15/model</span>
+<span class="ansi-blue-fg">Get the train data</span>
+<span class="ansi-blue-fg">Tokenize the input and output data and create the vocabularies</span>
+<span class="ansi-blue-fg">Input vocab:  11460</span>
+<span class="ansi-blue-fg">Output vocab:  9383</span>
+<span class="ansi-blue-fg">Creating the checkpoint ...</span>
+<span class="ansi-blue-fg">Last checkpoint restored.</span>
+<span class="ansi-blue-fg">Training the model ....</span>
+<span class="ansi-blue-fg">Starting epoch 1</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 0 Loss 0.7465 Accuracy 0.3560</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 100 Loss 0.7395 Accuracy 0.3574</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 200 Loss 0.7495 Accuracy 0.3559</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 300 Loss 0.7552 Accuracy 0.3551</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 400 Loss 0.7641 Accuracy 0.3543</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 500 Loss 0.7689 Accuracy 0.3541</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 600 Loss 0.7754 Accuracy 0.3538</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 700 Loss 0.7815 Accuracy 0.3535</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 800 Loss 0.7849 Accuracy 0.3531</span>
+<span class="ansi-blue-fg">Epoch 1 Batch 900 Loss 0.7891 Accuracy 0.3530</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 1 in /opt/ml/checkpoints/ckpt-9</span>
+<span class="ansi-blue-fg">Starting epoch 2</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 0 Loss 0.7752 Accuracy 0.3616</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 100 Loss 0.6931 Accuracy 0.3643</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 200 Loss 0.7000 Accuracy 0.3629</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 300 Loss 0.7107 Accuracy 0.3621</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 400 Loss 0.7174 Accuracy 0.3610</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 500 Loss 0.7233 Accuracy 0.3607</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 600 Loss 0.7292 Accuracy 0.3600</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 700 Loss 0.7342 Accuracy 0.3596</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 800 Loss 0.7372 Accuracy 0.3593</span>
+<span class="ansi-blue-fg">Epoch 2 Batch 900 Loss 0.7408 Accuracy 0.3589</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 2 in /opt/ml/checkpoints/ckpt-10</span>
+<span class="ansi-blue-fg">Starting epoch 3</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 0 Loss 0.6146 Accuracy 0.3627</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 100 Loss 0.6685 Accuracy 0.3686</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 200 Loss 0.6670 Accuracy 0.3673</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 300 Loss 0.6770 Accuracy 0.3664</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 400 Loss 0.6802 Accuracy 0.3660</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 500 Loss 0.6862 Accuracy 0.3653</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 600 Loss 0.6914 Accuracy 0.3650</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 700 Loss 0.6965 Accuracy 0.3646</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 800 Loss 0.7007 Accuracy 0.3640</span>
+<span class="ansi-blue-fg">Epoch 3 Batch 900 Loss 0.7036 Accuracy 0.3641</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 3 in /opt/ml/checkpoints/ckpt-11</span>
+<span class="ansi-blue-fg">Starting epoch 4</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 0 Loss 0.6168 Accuracy 0.3884</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 100 Loss 0.6127 Accuracy 0.3745</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 200 Loss 0.6317 Accuracy 0.3719</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 300 Loss 0.6400 Accuracy 0.3723</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 400 Loss 0.6493 Accuracy 0.3705</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 500 Loss 0.6558 Accuracy 0.3700</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 600 Loss 0.6614 Accuracy 0.3694</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 700 Loss 0.6638 Accuracy 0.3692</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 800 Loss 0.6702 Accuracy 0.3686</span>
+<span class="ansi-blue-fg">Epoch 4 Batch 900 Loss 0.6730 Accuracy 0.3683</span>
+<span class="ansi-blue-fg">Saving checkpoint for epoch 4 in /opt/ml/checkpoints/ckpt-12</span>
+<span class="ansi-blue-fg">Starting epoch 5</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 0 Loss 0.6213 Accuracy 0.3940</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 100 Loss 0.5858 Accuracy 0.3795</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 200 Loss 0.6030 Accuracy 0.3767</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 300 Loss 0.6117 Accuracy 0.3760</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 400 Loss 0.6194 Accuracy 0.3754</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 500 Loss 0.6277 Accuracy 0.3743</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 600 Loss 0.6322 Accuracy 0.3742</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 700 Loss 0.6369 Accuracy 0.3733</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 800 Loss 0.6421 Accuracy 0.3726</span>
+<span class="ansi-blue-fg">Epoch 5 Batch 900 Loss 0.6467 Accuracy 0.3722</span>
+
+2020-11-12 19:13:13 Uploading - Uploading generated training model
+2020-11-12 19:13:13 Completed - Training job completed
+<span class="ansi-blue-fg">Saving checkpoint for epoch 5 in /opt/ml/checkpoints/ckpt-13</span>
+<span class="ansi-blue-fg">Saving the model ....</span>
+<span class="ansi-blue-fg">Saving the model parameters</span>
+<span class="ansi-blue-fg">Saving the dictionaries ....</span>
+<span class="ansi-blue-fg">2020-11-12 19:13:02,312 sagemaker_tensorflow_container.training WARNING  Your model will NOT be servable with SageMaker TensorFlow Serving container. The model artifact was not saved in the TensorFlow SavedModel directory structure:</span>
+<span class="ansi-blue-fg">https://www.tensorflow.org/guide/saved_model#structure_of_a_savedmodel_directory</span>
+<span class="ansi-blue-fg">2020-11-12 19:13:02,312 sagemaker-containers INFO     Reporting training SUCCESS</span>
+Training seconds: 2040
+Billable seconds: 2040
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And this training job will return a new trained model, you can download to make prediction as we describe in a former section.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Delete-the-experiment">
+<a class="anchor" href="#Delete-the-experiment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Delete the experiment<a class="anchor-link" href="#Delete-the-experiment"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">training_experiment</span><span class="o">.</span><span class="n">delete_all</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">"--force"</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="References">
+<a class="anchor" href="#References" aria-hidden="true"><span class="octicon octicon-link"></span></a>References<a class="anchor-link" href="#References"> </a>
+</h1>
+<ul>
+<li>Referencias for experiment and trial
+<a href="https://github.com/shashankprasanna/sagemaker-training-tutorial/blob/master/sagemaker-training-tutorial.ipynb">https://github.com/shashankprasanna/sagemaker-training-tutorial/blob/master/sagemaker-training-tutorial.ipynb</a>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><a class="u-url" href="/BlogEms/nlp/sagemaker/tensorflow%202/2020/11/15/transformer_nmt_training_and_serving.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/BlogEms/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/BlogEms/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/BlogEms/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/edumunozsala" title="edumunozsala"><svg class="svg-icon grey"><use xlink:href="/BlogEms/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/emunozsala" title="emunozsala"><svg class="svg-icon grey"><use xlink:href="/BlogEms/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
